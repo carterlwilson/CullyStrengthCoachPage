@@ -149,9 +149,7 @@ export const {
   editIterations } = workoutScheduleSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
-export const selectMultipliers = (state: RootState, scheduleIndex: number, blockIndex: number, weekIndex: number, dayIndex: number) => {
-    state.workoutSchedule.Schedules[scheduleIndex].Blocks[blockIndex].Weeks[weekIndex].Days[dayIndex];
-}
+export const selectMultipliers = (state: RootState, scheduleIndex: number, blockIndex: number, weekIndex: number, dayIndex: number) => state.workoutSchedule.Schedules[scheduleIndex].Blocks[blockIndex].Weeks[weekIndex].Days[dayIndex];
 
 export const selectSchedule = (state: RootState, scheduleIndex: number) => state.workoutSchedule.Schedules[scheduleIndex];
 
