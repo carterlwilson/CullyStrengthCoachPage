@@ -1,0 +1,33 @@
+    <ChakraProvider>
+
+      <Router>
+
+        <Box>
+          <Stack direction={'column'}>
+              <Link to="/testPage1">
+                <span>Test Page 1</span>
+              </Link>
+              <Link to="testPage2">
+                <span>Test Page 2</span>
+              </Link>
+          </Stack>
+        </Box>
+
+        <Switch>
+          <Routes>
+            <Route path='/' element={<HomePage />} />
+            <Route path='/testPage1' element={<TestPage1 />} />
+            <Route path='/testPage2' element={<TestPage2 />} />
+            {/* {routes.map((route, index) => (
+              // Render more <Route>s with the same paths as
+              // above, but different components this time.
+              <Route
+                key={index}
+                path={route.path}
+                element={<route.main />}
+              />
+            ))} */}
+          </Routes>
+        </Switch>
+      </Router>
+    </ChakraProvider>
