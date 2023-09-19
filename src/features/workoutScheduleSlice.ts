@@ -1,16 +1,15 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { Root } from 'react-dom/client'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../app/Store'
-import DataPersistence from '../services/DataPersistence';
-import { ChangeMultiplierPayload, UpdateExercisePayload, SetSchedulePayload, AddExercisePayload, DeleteExercisePayload, AddWeekPayload, DeleteWeekPayload, AddBlockPayload, DeleteBlockPayload, DeleteSchedulePayload, EditIterationsPayload } from '../types/PayloadTypes';
-import { WorkoutScheduleState, WorkoutSchedule } from '../types/types';
+import DataPersistence from '../services/DataPersistence'
+import { type ChangeMultiplierPayload, type UpdateExercisePayload, type SetSchedulePayload, type AddExercisePayload, type DeleteExercisePayload, type AddWeekPayload, type DeleteWeekPayload, type AddBlockPayload, type DeleteBlockPayload, type DeleteSchedulePayload, type EditIterationsPayload } from '../types/PayloadTypes'
+import { type WorkoutScheduleState, type WorkoutSchedule, type Day } from '../types/types'
 
 // Define the initial state using that type
-const initialState = {
-    Schedules: []
-} as WorkoutScheduleState;
+const initialState: WorkoutScheduleState = {
+  Schedules: []
+}
 
-const dataPersistence = new DataPersistence();
+const dataPersistence = new DataPersistence()
 
 export const workoutScheduleSlice = createSlice({
   name: 'workoutSchedule',
@@ -31,126 +30,127 @@ export const workoutScheduleSlice = createSlice({
         .Blocks[action.payload.blockIndex]
         .Weeks[action.payload.weekIndex]
         .Days[action.payload.dayIndex]
-        .Exercises[action.payload.exerciseIndex].Name = action.payload.name;
+        .Exercises[action.payload.exerciseIndex].Name = action.payload.name
 
       state
         .Schedules[action.payload.scheduleIndex]
         .Blocks[action.payload.blockIndex]
         .Weeks[action.payload.weekIndex]
         .Days[action.payload.dayIndex]
-        .Exercises[action.payload.exerciseIndex].Sets = action.payload.sets;
+        .Exercises[action.payload.exerciseIndex].Sets = action.payload.sets
 
       state
         .Schedules[action.payload.scheduleIndex]
         .Blocks[action.payload.blockIndex]
         .Weeks[action.payload.weekIndex]
         .Days[action.payload.dayIndex]
-        .Exercises[action.payload.exerciseIndex].Reps = action.payload.reps;
+        .Exercises[action.payload.exerciseIndex].Reps = action.payload.reps
 
       state
         .Schedules[action.payload.scheduleIndex]
         .Blocks[action.payload.blockIndex]
         .Weeks[action.payload.weekIndex]
         .Days[action.payload.dayIndex]
-        .Exercises[action.payload.exerciseIndex].Multiplier = action.payload.multiplier;
+        .Exercises[action.payload.exerciseIndex].Multiplier = action.payload.multiplier
 
-      dataPersistence.updateSchedules(state);
+      dataPersistence.updateSchedules(state).catch(() => {})
     },
     setSchedule: (state, action: PayloadAction<SetSchedulePayload>) => {
-        state.Schedules[action.payload.index] = action.payload.schedule;
+      state.Schedules[action.payload.index] = action.payload.schedule
     },
     addSchedule: (state, action: PayloadAction<WorkoutSchedule>) => {
-      state.Schedules.push(action.payload);
-      dataPersistence.addNewSchedule(action.payload);
+      state.Schedules.push(action.payload)
+      dataPersistence.addNewSchedule(action.payload).catch(() => {})
     },
     deleteSchedule: (state, action: PayloadAction<DeleteSchedulePayload>) => {
-      state.Schedules.splice(action.payload.index, 1);
-      dataPersistence.deleteSchedule(action.payload.id);
+      state.Schedules.splice(action.payload.index, 1)
+      dataPersistence.deleteSchedule(action.payload.id).catch(() => {})
     },
     setInitialSchedules: (state, action: PayloadAction<WorkoutSchedule[]>) => {
-      state.Schedules = action.payload;
+      state.Schedules = action.payload
     },
     addExercise: (state, action: PayloadAction<AddExercisePayload>) => {
       state
-      .Schedules[action.payload.scheduleIndex]
-      .Blocks[action.payload.blockIndex]
-      .Weeks[action.payload.weekIndex]
-      .Days[action.payload.dayIndex]
-      .Exercises.push(action.payload.exercise);
-      dataPersistence.updateSchedules(state);
+        .Schedules[action.payload.scheduleIndex]
+        .Blocks[action.payload.blockIndex]
+        .Weeks[action.payload.weekIndex]
+        .Days[action.payload.dayIndex]
+        .Exercises.push(action.payload.exercise)
+      dataPersistence.updateSchedules(state).catch(() => {})
     },
     deleteExercise: (state, action: PayloadAction<DeleteExercisePayload>) => {
       state
-      .Schedules[action.payload.scheduleIndex]
-      .Blocks[action.payload.blockIndex]
-      .Weeks[action.payload.weekIndex]
-      .Days[action.payload.dayIndex]
-      .Exercises.splice(action.payload.exerciseIndex, 1);
-      dataPersistence.updateSchedules(state);
+        .Schedules[action.payload.scheduleIndex]
+        .Blocks[action.payload.blockIndex]
+        .Weeks[action.payload.weekIndex]
+        .Days[action.payload.dayIndex]
+        .Exercises.splice(action.payload.exerciseIndex, 1)
+      dataPersistence.updateSchedules(state).catch(() => {})
     },
     addWeek: (state, action: PayloadAction<AddWeekPayload>) => {
       state
-      .Schedules[action.payload.scheduleIndex]
-      .Blocks[action.payload.blockIndex]
-      .Weeks = 
+        .Schedules[action.payload.scheduleIndex]
+        .Blocks[action.payload.blockIndex]
+        .Weeks =
         state
           .Schedules[action.payload.scheduleIndex]
           .Blocks[action.payload.blockIndex]
-          .Weeks.concat(action.payload.week);
-      dataPersistence.updateSchedules(state);
+          .Weeks.concat(action.payload.week)
+      dataPersistence.updateSchedules(state).catch(() => {})
     },
     deleteWeek: (state, action: PayloadAction<DeleteWeekPayload>) => {
       state
-      .Schedules[action.payload.scheduleIndex]
-      .Blocks[action.payload.blockIndex]
-      .Weeks.splice(action.payload.weekIndex, 1);
-      dataPersistence.updateSchedules(state);
+        .Schedules[action.payload.scheduleIndex]
+        .Blocks[action.payload.blockIndex]
+        .Weeks.splice(action.payload.weekIndex, 1)
+      dataPersistence.updateSchedules(state).catch(() => {})
     },
     addBlock: (state, action: PayloadAction<AddBlockPayload>) => {
       state
         .Schedules[action.payload.scheduleIndex]
-        .Blocks = 
+        .Blocks =
           state
             .Schedules[action.payload.scheduleIndex]
-            .Blocks.concat(action.payload.block);
-        dataPersistence.updateSchedules(state);
+            .Blocks.concat(action.payload.block)
+      dataPersistence.updateSchedules(state).catch(() => {})
     },
     deleteBlock: (state, action: PayloadAction<DeleteBlockPayload>) => {
       state
         .Schedules[action.payload.scheduleIndex]
-        .Blocks.splice(action.payload.blockIndex, 1);
-      dataPersistence.updateSchedules(state);
+        .Blocks.splice(action.payload.blockIndex, 1)
+      dataPersistence.updateSchedules(state).catch(() => {})
     },
     editIterations: (state, action: PayloadAction<EditIterationsPayload>) => {
       state
         .Schedules[action.payload.scheduleIndex]
-        .CurrentBlock = action.payload.block;
+        .CurrentBlock = action.payload.block
       state
         .Schedules[action.payload.scheduleIndex]
-        .CurrentWeek = action.payload.week;
-      dataPersistence.updateSchedules(state);
+        .CurrentWeek = action.payload.week
+      dataPersistence.updateSchedules(state).catch(() => {})
     }
-  },
+  }
 })
 
-export const { 
-  changeMultiplier, 
-  setSchedule, 
-  addSchedule, 
-  updateExercise, 
-  setInitialSchedules, 
-  addExercise, 
+export const {
+  changeMultiplier,
+  setSchedule,
+  addSchedule,
+  updateExercise,
+  setInitialSchedules,
+  addExercise,
   deleteExercise,
   addWeek,
   deleteWeek,
   addBlock,
   deleteBlock,
   deleteSchedule,
-  editIterations } = workoutScheduleSlice.actions
+  editIterations
+} = workoutScheduleSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
-export const selectMultipliers = (state: RootState, scheduleIndex: number, blockIndex: number, weekIndex: number, dayIndex: number) => state.workoutSchedule.Schedules[scheduleIndex].Blocks[blockIndex].Weeks[weekIndex].Days[dayIndex];
+export const selectMultipliers = (state: RootState, scheduleIndex: number, blockIndex: number, weekIndex: number, dayIndex: number): Day => state.workoutSchedule.Schedules[scheduleIndex].Blocks[blockIndex].Weeks[weekIndex].Days[dayIndex]
 
-export const selectSchedule = (state: RootState, scheduleIndex: number) => state.workoutSchedule.Schedules[scheduleIndex];
+export const selectSchedule = (state: RootState, scheduleIndex: number): WorkoutSchedule => state.workoutSchedule.Schedules[scheduleIndex]
 
 export default workoutScheduleSlice.reducer

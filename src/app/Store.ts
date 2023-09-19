@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
-import workoutScheduleReducer from '../features/workoutScheduleSlice';
+import workoutScheduleReducer from '../features/workoutScheduleSlice'
 // ...
 
 export const store = configureStore({
   reducer: {
-    workoutSchedule: workoutScheduleReducer,
-  },
+    workoutSchedule: workoutScheduleReducer
+  }
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

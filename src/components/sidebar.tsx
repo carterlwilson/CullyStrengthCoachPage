@@ -1,8 +1,8 @@
-import { Box, VStack } from '@chakra-ui/react';
-import React from 'react';
+import { Box, VStack } from '@chakra-ui/react'
+import React, { type ReactElement } from 'react'
 
-export default function Sidebar() {
-    return (
+export default function Sidebar (): ReactElement {
+  return (
         <Box>
             <VStack>
                 <a href='../pages/testPage1'>
@@ -13,5 +13,5 @@ export default function Sidebar() {
                 </a>
             </VStack>
         </Box>
-    )
+  )
 }
