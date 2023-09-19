@@ -28,7 +28,7 @@ export default function ScheduleBuilder (): ReactElement {
     dataPersistence.getSchedules().then(response => {
       dispatch(setInitialSchedules(response))
     }).catch(() => {})
-  }, [])
+  }, [dispatch])
 
   const getScheduleButtonTheme = (index: number): string => {
     if (index === currentlyShownWorkoutIndex) {

@@ -34,7 +34,7 @@ function ExerciseEditorPage (): ReactElement {
 
   useEffect(() => {
     getExercises()
-  }, [exercises])
+  })
 
   return (
         <Box mt={5} ml={5} mr={5}>

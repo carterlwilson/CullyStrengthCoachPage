@@ -39,30 +39,6 @@ function ClientPage (): ReactElement {
   const cancelRef = React.useRef() as any
   const toast = useToast()
 
-  const getClients = (): void => {
-    dataPersistence.getClients()
-      .then(response => {
-        setClientList(response)
-      })
-      .catch(() => {})
-  }
-
-  const getExerciseRefs = (): void => {
-    dataPersistence.getExercises()
-      .then(response => {
-        setExerciseRefs(response)
-      })
-      .catch(() => {})
-  }
-
-  const getSchedules = (): void => {
-    dataPersistence.getSchedules()
-      .then(response => {
-        setScheduleList(response)
-      })
-      .catch(() => {})
-  }
-
   const addClient = (): void => {
     const id = uuidv4()
     const newMaxes: Max[] = []
@@ -216,10 +192,24 @@ function ClientPage (): ReactElement {
   }
 
   useEffect(() => {
-    getClients()
-    getExerciseRefs()
-    getSchedules()
-  }, [activeClient])
+    dataPersistence.getClients()
+      .then(response => {
+        setClientList(response)
+      })
+      .catch(() => {})
+
+    dataPersistence.getExercises()
+      .then(response => {
+        setExerciseRefs(response)
+      })
+      .catch(() => {})
+
+    dataPersistence.getSchedules()
+      .then(response => {
+        setScheduleList(response)
+      })
+      .catch(() => {})
+  })
 
   return (
         <Flex direction="column" mt={5}>
