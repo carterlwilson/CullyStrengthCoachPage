@@ -1,7 +1,7 @@
 import { AccordionItem, Text, Table, TableContainer, Tr, Th, Tbody, Thead, NumberInput, NumberInputField, Button, useDisclosure, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, RadioGroup, Stack, Radio, Box } from '@chakra-ui/react'
-import React, { type ReactElement, useEffect, useState } from 'react'
+import React, { type ReactElement, useEffect, useState, useCallback } from 'react'
 import { useDispatch } from 'react-redux'
-import { type ExerciseReference } from '../../types/types'
+import { Exercise, type ExerciseReference } from '../../types/types'
 import { ExerciseView } from './ExerciseView'
 import { addExercise } from '../../features/workoutScheduleSlice'
 import { type AddExercisePayload } from '../../types/PayloadTypes'
@@ -20,13 +20,15 @@ export default function ExercisesView (props: any): ReactElement {
   const [exercises, setExercises] = useState<ExerciseReference[]>([])
 
   useEffect(() => {
-    getExercises().catch(() => {})
-  }, [getExercises])
+    getExercises().then((response) => {
+      setExercises(response)
+    }).catch(() => {})
+  }, [])
 
-  async function getExercises (): Promise<void> {
+  const getExercises = useCallback(async (): Promise<ExerciseReference[]> => {
     const exercises = await dataPersistence.getExercises()
-    setExercises(exercises)
-  }
+    return exercises
+  }, [dataPersistence])
 
   const dispatch = useDispatch()
 
