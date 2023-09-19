@@ -20,10 +20,13 @@ export default function ExercisesView (props: any): ReactElement {
   const [exercises, setExercises] = useState<ExerciseReference[]>([])
 
   useEffect(() => {
-    dataPersistence.getExercises().then(
-      (response) => { setExercises(response) }
-    ).catch(() => {})
-  }, [])
+    getExercises().catch(() => {})
+  }, [getExercises])
+
+  async function getExercises (): Promise<void> {
+    const exercises = await dataPersistence.getExercises()
+    setExercises(exercises)
+  }
 
   const dispatch = useDispatch()
 
