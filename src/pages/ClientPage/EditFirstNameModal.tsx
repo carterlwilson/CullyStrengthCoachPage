@@ -1,28 +1,27 @@
-import React, { useState } from 'react'
-import { Button, FormControl, FormLabel, Input, Modal, ModalBody, ModalContent, ModalOverlay, useDisclosure } from '@chakra-ui/react'
-import DataPersistence from '../../services/DataPersistence';
+import React, { type ReactElement, useState } from 'react'
+import { Button, FormControl, FormLabel, Input, Modal, ModalBody, ModalContent } from '@chakra-ui/react'
+import DataPersistence from '../../services/DataPersistence'
 
-function EditFirstNameModal(props: any) {
+function EditFirstNameModal (props: any): ReactElement {
+  const dataPersistence = new DataPersistence()
 
-    const dataPersistence = new DataPersistence();
-    
-    const [editedName, setEditedName] = useState('')
+  const [editedName, setEditedName] = useState('')
 
-    const updateName = () => {
-        const updatedClient = {...props.client}
-        updatedClient.firstName = editedName
-        dataPersistence.updateClient(updatedClient)
-        props.editFirstNameDialog.onClose()
-        props.setNewName(editedName)
-    }
+  const updateName = (): void => {
+    const updatedClient = { ...props.client }
+    updatedClient.firstName = editedName
+    dataPersistence.updateClient(updatedClient).catch((() => {}))
+    props.editFirstNameDialog.onClose()
+    props.setNewName(editedName)
+  }
 
-    return(
+  return (
         <Modal isOpen={props.editFirstNameDialog.isOpen} onClose={props.editFirstNameDialog.onClose}>
             <ModalContent>
                 <ModalBody>
                     <FormControl>
                         <FormLabel>First Name</FormLabel>
-                        <Input type="text" onChange={(event) => setEditedName(event.target.value)}/>
+                        <Input type="text" onChange={(event) => { setEditedName(event.target.value) }}/>
                         <Button onClick={props.editFirstNameDialog.onClose} mt={5} mr={5}>
                             Cancel
                         </Button>
@@ -33,7 +32,7 @@ function EditFirstNameModal(props: any) {
                 </ModalBody>
             </ModalContent>
         </Modal>
-    )
+  )
 }
 
 export default EditFirstNameModal

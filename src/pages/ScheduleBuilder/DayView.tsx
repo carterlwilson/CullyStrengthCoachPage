@@ -1,8 +1,9 @@
-import { AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box } from "@chakra-ui/react";
-import ExercisesView from "./ExercisesView";
+import { AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box } from '@chakra-ui/react'
+import ExercisesView from './ExercisesView'
+import React, { type ReactElement } from 'react'
 
-export default function DayView(props: any) {
-    return(
+export default function DayView (props: any): ReactElement {
+  return (
         <Box>
             <AccordionItem >
                 <h2>
@@ -14,7 +15,7 @@ export default function DayView(props: any) {
                     </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
-                    <ExercisesView 
+                    <ExercisesView
                         exercises={props.day.Exercises}
                         scheduleIndex={props.scheduleIndex}
                         workoutIndex={props.workoutIndex}
@@ -25,5 +26,5 @@ export default function DayView(props: any) {
                 </AccordionPanel>
             </AccordionItem>
         </Box>
-    )
+  )
 }

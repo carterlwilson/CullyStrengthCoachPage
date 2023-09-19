@@ -1,69 +1,77 @@
-import { DeleteIcon } from "@chakra-ui/icons";
-import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, Button, Heading, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Stack, useDisclosure, Text, HStack, Input, FormControl, FormLabel, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper } from "@chakra-ui/react";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { addBlock, deleteSchedule, editIterations } from "../../features/workoutScheduleSlice";
-import { AddBlockPayload, DeleteSchedulePayload, EditIterationsPayload } from "../../types/PayloadTypes";
-import { Block, Day, Week } from "../../types/types";
-import BlockView from "./BlockView";
+import { CopyIcon, DeleteIcon } from '@chakra-ui/icons'
+import { Accordion, Box, Button, Heading, Stack, useDisclosure, Text, HStack, FormControl, FormLabel, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Modal, ModalContent, ModalOverlay, ModalHeader, ModalCloseButton, Input, ModalBody, ModalFooter } from '@chakra-ui/react'
+import React, { type ReactElement, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { addBlock, addSchedule, deleteSchedule, editIterations } from '../../features/workoutScheduleSlice'
+import { type AddBlockPayload, type DeleteSchedulePayload, type EditIterationsPayload } from '../../types/PayloadTypes'
+import { type WorkoutSchedule, type Block, type Day, type Week } from '../../types/types'
+import BlockView from './BlockView'
+import { v4 as uuidv4 } from 'uuid'
 
-export default function ScheduleView(props: any) {
+export default function ScheduleView (props: any): ReactElement {
+  const { onClose } = useDisclosure()
+  const copyScheduleModal = useDisclosure()
 
-    const { isOpen, onOpen, onClose } = useDisclosure()
+  const dispatch = useDispatch()
 
-    const dispatch = useDispatch();
+  const [editedBlockNumber, setEditedBlockNumber] = useState(0)
+  const [editedWeekNumber, setEditedWeekNumber] = useState(0)
+  const [newScheduleName, setNewScheduleName] = useState('')
 
-    const [newBlockName, setNewBlockName] = useState("newBlock");
-    const [editedBlockNumber, setEditedBlockNumber] = useState(0);
-    const [editedWeekNumber, setEditedWeekNumber] = useState(0);
-
-    const addNewBlock = () => {
-        const newDay1: Day = {
-            Exercises: []
-        }
-        const newDay2: Day = {
-            Exercises: []
-        }
-        const newDay3: Day = {
-            Exercises: []
-        }
-        const newWeek1: Week = {
-            Days: [newDay1, newDay2, newDay3]
-        }
-        const newBlock: Block = {
-            Weeks: [newWeek1]
-        }
-        const payload: AddBlockPayload = {
-            scheduleIndex: props.scheduleIndex,
-            block: newBlock
-        }
-        dispatch(addBlock(payload));
-        onClose();
+  const addNewBlock = (): void => {
+    const newDay1: Day = {
+      Exercises: []
     }
-
-    const getWeeksMax = (blockNum: number) => {
-        return props.workout.Blocks[blockNum].Weeks.length
+    const newDay2: Day = {
+      Exercises: []
     }
-
-    const _deleteSchedule = () => {
-        props.resetIndex();
-        const payload: DeleteSchedulePayload = {
-            index: props.scheduleIndex,
-            id: props.workout.Id
-        }
-        dispatch(deleteSchedule(payload));
+    const newDay3: Day = {
+      Exercises: []
     }
-
-    const _editIterations = () => {
-        const payload: EditIterationsPayload = {
-            scheduleIndex: props.scheduleIndex,
-            block: editedBlockNumber,
-            week: editedWeekNumber
-        }
-        dispatch(editIterations(payload));
+    const newWeek1: Week = {
+      Days: [newDay1, newDay2, newDay3]
     }
+    const newBlock: Block = {
+      Weeks: [newWeek1]
+    }
+    const payload: AddBlockPayload = {
+      scheduleIndex: props.scheduleIndex,
+      block: newBlock
+    }
+    dispatch(addBlock(payload))
+    onClose()
+  }
 
-    return(
+  const getWeeksMax = (blockNum: number): number => {
+    return props.workout.Blocks[blockNum].Weeks.length
+  }
+
+  const _deleteSchedule = (): void => {
+    props.resetIndex()
+    const payload: DeleteSchedulePayload = {
+      index: props.scheduleIndex,
+      id: props.workout.Id
+    }
+    dispatch(deleteSchedule(payload))
+  }
+
+  const _editIterations = (): void => {
+    const payload: EditIterationsPayload = {
+      scheduleIndex: props.scheduleIndex,
+      block: editedBlockNumber,
+      week: editedWeekNumber
+    }
+    dispatch(editIterations(payload))
+  }
+
+  const onConfirmCopySchedule = (): void => {
+    const newSchedule: WorkoutSchedule = { ...props.workout }
+    newSchedule.Name = newScheduleName
+    newSchedule.Id = uuidv4()
+    dispatch(addSchedule(newSchedule))
+  }
+
+  return (
         <Box ml={5} mt={5} mr={5}>
             <Stack>
                 <Heading>
@@ -71,7 +79,10 @@ export default function ScheduleView(props: any) {
                         <Text>
                             {props.workout.Name}
                         </Text>
-                        {props.workout.Name != "Default" &&
+                        <Button>
+                            <CopyIcon onClick={copyScheduleModal.onOpen}/>
+                        </Button>
+                        {props.workout.Name !== 'Default' &&
                             <Button onClick={_deleteSchedule}>
                                 <DeleteIcon _hover={{ color: 'green' }}/>
                             </Button>
@@ -82,52 +93,70 @@ export default function ScheduleView(props: any) {
                     <HStack>
                         <Box>
                             <FormLabel>Current Block</FormLabel>
-                            <NumberInput 
+                            <NumberInput
                             defaultValue={props.workout.CurrentBlock + 1}
                             min={1}
                             max={props.workout.Blocks.length}
                             w='75px'
-                            onChange={(value) => setEditedBlockNumber(Number(value) - 1)}>
+                            onChange={(value) => { setEditedBlockNumber(Number(value) - 1) }}>
                                 <NumberInputField />
                                 <NumberInputStepper>
                                     <NumberIncrementStepper />
                                     <NumberDecrementStepper />
                                 </NumberInputStepper>
-                            </NumberInput>         
+                            </NumberInput>
                         </Box>
                         <Box>
                             <FormLabel>Current Week</FormLabel>
-                            <NumberInput 
+                            <NumberInput
                             defaultValue={props.workout.CurrentWeek + 1}
                             min={1}
                             max={getWeeksMax(editedBlockNumber)}
                             w='75px'
-                            onChange={(value) => setEditedWeekNumber(Number(value) - 1)}>
+                            onChange={(value) => { setEditedWeekNumber(Number(value) - 1) }}>
                                 <NumberInputField />
                                 <NumberInputStepper>
                                     <NumberIncrementStepper />
                                     <NumberDecrementStepper />
                                 </NumberInputStepper>
-                            </NumberInput> 
+                            </NumberInput>
                         </Box>
-                    </HStack>           
+                    </HStack>
                     <Button colorScheme='green' onClick={_editIterations} mt={3} mb={3}>
                         Submit Iteration Changes
                     </Button>
                 </FormControl>
                 <Accordion allowMultiple>
                     {props.workout.Blocks.map((block: any, index: number) => {
-                        return(
-                            <BlockView 
-                                key={index} 
+                      return (
+                            <BlockView
+                                key={index}
                                 block={props.workout.Blocks[index]}
                                 scheduleIndex={props.scheduleIndex}
                                 blockIndex={index}/>
-                        );
+                      )
                     })}
                 </Accordion>
                 <Button onClick={addNewBlock}>Add New Block</Button>
             </Stack>
+            <Modal isOpen={copyScheduleModal.isOpen} onClose={copyScheduleModal.onClose}>
+                <ModalOverlay/>
+                <ModalContent>
+                    <ModalHeader>Copy Schedule</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <Text mb='8px'>What do you want to name the new schedule?</Text>
+                        <Input
+                            value={newScheduleName}
+                            onChange={event => { setNewScheduleName(event.target.value) }}
+                            size='sm'
+                        />
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button onClick={onConfirmCopySchedule}>Add</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </Box>
-    );
+  )
 }

@@ -1,239 +1,229 @@
-import { AlertDialog, AlertDialogBody, AlertDialogHeader, Box, Button, Flex, FormControl, FormLabel, Input, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, Text, Modal, ModalHeader, ModalBody, ModalContent, ModalOverlay, IconButton, Select, HStack } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
-import DataPersistence from '../../services/DataPersistence';
-import { Client, ExerciseReference, Max, WorkoutSchedule } from '../../types/types';
-import {v4 as uuidv4} from 'uuid';
-import { useToast } from '@chakra-ui/react'
-import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import { Box, Button, Flex, FormControl, FormLabel, Input, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, Text, Modal, ModalHeader, ModalBody, ModalContent, ModalOverlay, IconButton, Select, HStack, useToast } from '@chakra-ui/react'
+import React, { type ReactElement, useEffect, useState } from 'react'
+import DataPersistence from '../../services/DataPersistence'
+import { type Client, type ExerciseReference, type Max, type WorkoutSchedule } from '../../types/types'
+import { v4 as uuidv4 } from 'uuid'
+import { AddIcon, EditIcon } from '@chakra-ui/icons'
 import EditFirstNameModal from './EditFirstNameModal'
-import { act } from 'react-dom/test-utils';
-import EditLastNameModal from './EditLastNameModal';
-import EditScheduleModal from './EditScheduleModal';
+import EditLastNameModal from './EditLastNameModal'
+import EditScheduleModal from './EditScheduleModal'
 
-const clients =[
-    {
-        "name": "Carter Wilson",
-        "exercises": [
-            {
-                "Bench Press": 100
-            },
-            {
-                "Squat": 150
-            },
-            {
-                "Deadlift": 200
-            },
-            {
-                "Overhead Press": 300
-            }
-        ]
+function ClientPage (): ReactElement {
+  const initialClient: Client = {
+    id: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    maxes: [],
+    scheduleId: ''
+  }
+
+  const dataPersistence = new DataPersistence()
+  const [clientList, setClientList] = useState<Client[]>([])
+  const [scheduleList, setScheduleList] = useState<WorkoutSchedule[]>([])
+  const [newFirstName, setNewFirstName] = useState('')
+  const [newLastName, setNewLastName] = useState('')
+  const [newEmail, setNewEmail] = useState('')
+  const [newScheduleId, setNewScheduleId] = useState('')
+  const [newMaxName, setNewMaxName] = useState('')
+  const [activeClient, setActiveClient] = useState(initialClient)
+  const [clientToDelete, setClientToDelete] = useState(initialClient)
+  const [exerciseRefs, setExerciseRefs] = useState<ExerciseReference[]>([])
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const deleteDialog = useDisclosure()
+  const maxesDialog = useDisclosure()
+  const newMaxNameDialog = useDisclosure()
+  const editFirstNameDialog = useDisclosure()
+  const editLastNameDialog = useDisclosure()
+  const editScheduleDialog = useDisclosure()
+  const cancelRef = React.useRef() as any
+  const toast = useToast()
+
+  const getClients = (): void => {
+    dataPersistence.getClients()
+      .then(response => {
+        setClientList(response)
+      })
+      .catch(() => {})
+  }
+
+  const getExerciseRefs = (): void => {
+    dataPersistence.getExercises()
+      .then(response => {
+        setExerciseRefs(response)
+      })
+      .catch(() => {})
+  }
+
+  const getSchedules = (): void => {
+    dataPersistence.getSchedules()
+      .then(response => {
+        setScheduleList(response)
+      })
+      .catch(() => {})
+  }
+
+  const addClient = (): void => {
+    const id = uuidv4()
+    const newMaxes: Max[] = []
+    const newClient: Client = {
+      firstName: newFirstName,
+      lastName: newLastName,
+      email: newEmail,
+      maxes: newMaxes,
+      id,
+      scheduleId: newScheduleId
     }
-]
-
-function ClientPage() {
-
-    const dataPersistence = new DataPersistence();
-    const [clientList, setClientList] = useState<Client[]>([]);
-    const [scheduleList, setScheduleList] = useState<WorkoutSchedule[]>([]);
-    const [newFirstName, setNewFirstName] = useState("");
-    const [newLastName, setNewLastName] = useState("");
-    const [newEmail, setNewEmail] = useState("");
-    const [newScheduleId, setNewScheduleId] = useState("");
-    const [newMax, setNewMax] = useState<Max>();
-    const [newMaxName, setNewMaxName] = useState("")
-    const [activeClient, setActiveClient] = useState({} as Client);
-    const [clientToDelete, setClientToDelete] = useState({} as Client);
-    const [exerciseRefs, setExerciseRefs] = useState<ExerciseReference[]>([]);
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const deleteDialog = useDisclosure();
-    const maxesDialog = useDisclosure();
-    const newMaxNameDialog = useDisclosure();
-    const editFirstNameDialog = useDisclosure();
-    const editLastNameDialog = useDisclosure();
-    const editScheduleDialog = useDisclosure();
-    const cancelRef = React.useRef() as any;
-    const maxesCancelRef = React.useRef() as any;
-    const toast = useToast();
-
-    const getClients = () => {
-        dataPersistence.getClients().then(response => {
-            setClientList(response);
+    dataPersistence.addNewClient(newClient)
+      .then(success => {
+        setClientList(clientList.concat(newClient))
+        toast({
+          description: 'Client Added successfully',
+          status: 'success',
+          duration: 3000,
+          isClosable: true
         })
-    }
-
-    const getExerciseRefs = () => {
-        dataPersistence.getExercises().then(response => {
-            setExerciseRefs(response);
+      })
+      .catch(error => {
+        console.log(error)
+        toast({
+          description: 'Error adding client',
+          status: 'error',
+          duration: 3000,
+          isClosable: true
         })
-    }
+      })
+  }
 
-    const getSchedules = () => {
-        dataPersistence.getSchedules().then(response => {
-            setScheduleList(response);
+  const openEditMaxesDialog = (client: Client): void => {
+    setActiveClient(client)
+    maxesDialog.onOpen()
+  }
+
+  const updateMax = (changeMaxEvent: React.ChangeEvent<HTMLInputElement>, index: number): void => {
+    const updatedClient = { ...activeClient }
+    updatedClient.maxes[index].weight = parseInt(changeMaxEvent.currentTarget.value)
+    setActiveClient(updatedClient)
+  }
+
+  const updateClientMaxes = (): void => {
+    maxesDialog.onClose()
+    dataPersistence.updateClient(activeClient)
+      .then(success => {
+        toast({
+          description: 'Client Maxes updated successfully',
+          status: 'success',
+          duration: 3000,
+          isClosable: true
         })
-    }
-
-    const addClient = () => {
-        const id = uuidv4();
-        const newMaxes: Max[] = [];
-        const newClient: Client = {
-            firstName: newFirstName,
-            lastName: newLastName,
-            email: newEmail,
-            maxes: newMaxes,
-            id: id,
-            scheduleId: newScheduleId
-        }
-        dataPersistence.addNewClient(newClient)
-        .then(success => {
-            setClientList(clientList.concat(newClient));
-            toast({
-                description: "Client Added successfully",
-                status: 'success',
-                duration: 3000,
-                isClosable: true,
-            })
+      })
+      .catch(error => {
+        console.log(error)
+        toast({
+          description: 'Error updating client maxes',
+          status: 'error',
+          duration: 3000,
+          isClosable: true
         })
-        .catch(error => {
-            console.log(error);
-            toast({
-                description: "Error adding client",
-                status: 'error',
-                duration: 3000,
-                isClosable: true
-            })
+      })
+  }
+
+  const onClickDelete = (client: Client): void => {
+    setClientToDelete(client)
+    deleteDialog.onOpen()
+  }
+
+  const addMax = (): void => {
+    const newMax: Max = {
+      name: newMaxName,
+      weight: 0
+    }
+    const updatedClient = { ...activeClient }
+    updatedClient.maxes.push(newMax)
+    setActiveClient(updatedClient)
+    newMaxNameDialog.onClose()
+  }
+
+  const deleteClient = (): void => {
+    console.log('deleting')
+    deleteDialog.onClose()
+    dataPersistence.deleteClient(clientToDelete)
+      .then(success => {
+        toast({
+          description: 'Client Deleted successfully',
+          status: 'success',
+          duration: 3000,
+          isClosable: true
         })
-    }
+        const updatedClientList = clientList.filter(client => client.id !== clientToDelete.id)
+        setClientList(updatedClientList)
+      })
+      .catch(error => {
+        console.log(error)
+        toast({
+          description: 'Error deleting client',
+          status: 'error',
+          duration: 3000,
+          isClosable: true
+        })
+      })
+  }
 
-    const openEditMaxesDialog = (client: Client) => {
-        setActiveClient(client);
-        maxesDialog.onOpen();
-    }
+  const getScheduleNameFromId = (id: string): string | undefined => {
+    return scheduleList.find(s => s.Id === id)?.Name
+  }
 
-    const updateMax = (changeMaxEvent: React.ChangeEvent<HTMLInputElement>, index: number) => {
-        const updatedClient = {...activeClient};
-        updatedClient.maxes[index].weight = parseInt(changeMaxEvent.currentTarget.value);
-        setActiveClient(updatedClient);
+  const openFirstNameEdit = (id: string): void => {
+    const matchingClient = clientList.find(c => c.id === id)
+    if (matchingClient != null) {
+      setActiveClient(matchingClient)
     }
+    editFirstNameDialog.onOpen()
+  }
 
-    const updateClientMaxes = () => {
-        maxesDialog.onClose();
-        dataPersistence.updateClient(activeClient)
-            .then(success => {
-                toast({
-                    description: "Client Maxes updated successfully",
-                    status: 'success',
-                    duration: 3000,
-                    isClosable: true,
-                })
-            })
-            .catch(error => {
-                console.log(error);
-                toast({
-                    description: "Error updating client maxes",
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true
-                })
-            })
+  const openLastNameEdit = (id: string): void => {
+    const matchingClient = clientList.find(c => c.id === id)
+    if (matchingClient != null) {
+      setActiveClient(matchingClient)
     }
+    editLastNameDialog.onOpen()
+  }
 
-    const onClickDelete = (client: Client) => {
-        setClientToDelete(client);
-        deleteDialog.onOpen();
+  const openScheduleEdit = (id: string): void => {
+    const matchingClient = clientList.find(c => c.id === id)
+    if (matchingClient != null) {
+      setActiveClient(matchingClient)
     }
+    editScheduleDialog.onOpen()
+  }
 
-    const addMax = () => {
-        const newMax: Max = {
-            name: newMaxName,
-            weight: 0
-        }
-        const updatedClient = {...activeClient};
-        updatedClient.maxes.push(newMax)
-        setActiveClient(updatedClient);
-        newMaxNameDialog.onClose()
-    }
+  const updateFirstName = (name: string): void => {
+    const updatedActiveClient = { ...activeClient }
+    updatedActiveClient.firstName = name
+    setActiveClient(updatedActiveClient)
+  }
 
-    const deleteClient = () => {
-        console.log('deleting')
-        deleteDialog.onClose();
-        dataPersistence.deleteClient(clientToDelete)
-            .then(success => {
-                toast({
-                    description: "Client Deleted successfully",
-                    status: 'success',
-                    duration: 3000,
-                    isClosable: true,
-                })
-                const updatedClientList = clientList.filter(client => client.id != clientToDelete.id);
-                setClientList(updatedClientList);
-            })
-            .catch(error => {
-                console.log(error);
-                toast({
-                    description: "Error deleting client",
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true
-                })
-            })
-    }
+  const updateLastName = (name: string): void => {
+    const updatedActiveClient = { ...activeClient }
+    updatedActiveClient.lastName = name
+    setActiveClient(updatedActiveClient)
+  }
 
-    const getScheduleNameFromId = (id: string) => {
-        return scheduleList.find(s => s.Id == id)?.Name
-    }
+  const updateSchedule = (scheduleId: string): void => {
+    const updatedActiveClient = { ...activeClient }
+    updatedActiveClient.scheduleId = scheduleId
+    setActiveClient(updatedActiveClient)
+  }
 
-    const openFirstNameEdit = (id: string) => {
-        const matchingClient = clientList.find(c => c.id == id)
-        if (matchingClient) {
-            setActiveClient(matchingClient)
-        }
-        editFirstNameDialog.onOpen()
-    }
-    
-    const openLastNameEdit = (id: string) => {
-        const matchingClient = clientList.find(c => c.id == id)
-        if (matchingClient) {
-            setActiveClient(matchingClient)
-        }
-        editLastNameDialog.onOpen()
-    }
+  useEffect(() => {
+    getClients()
+    getExerciseRefs()
+    getSchedules()
+  }, [activeClient])
 
-    const openScheduleEdit = (id: string) => {
-        const matchingClient = clientList.find(c => c.id == id)
-        if (matchingClient) {
-            setActiveClient(matchingClient)
-        }
-        editScheduleDialog.onOpen()
-    }
-
-    const updateFirstName = (name: string) => {
-        const updatedActiveClient = {...activeClient}
-        updatedActiveClient.firstName = name 
-        setActiveClient(updatedActiveClient)
-    }
-    
-    const updateLastName = (name: string) => {
-        const updatedActiveClient = {...activeClient}
-        updatedActiveClient.lastName = name 
-        setActiveClient(updatedActiveClient)
-    }
-
-    const updateSchedule = (scheduleId: string) => {
-        const updatedActiveClient = {...activeClient}
-        updatedActiveClient.scheduleId = scheduleId
-        setActiveClient(updatedActiveClient)
-    }
-
-    useEffect(() => {
-        getClients();
-        getExerciseRefs();
-        getSchedules();
-    }, [activeClient])
-
-    return (
+  return (
         <Flex direction="column" mt={5}>
-            <Button 
+            <Button
                 w="100px"
                 ml="25px"
                 onClick={onOpen}>Add Client</Button>
@@ -250,7 +240,7 @@ function ClientPage() {
                     </Thead>
                     <Tbody>
                         {clientList.map((client, index) => {
-                            return(
+                          return (
                                 <Tr key={index}>
                                     <Td>
                                         <HStack>
@@ -260,7 +250,7 @@ function ClientPage() {
                                             <IconButton
                                                 aria-label='Edit Name'
                                                 icon={<EditIcon />}
-                                                onClick={() => openFirstNameEdit(client.id)}
+                                                onClick={() => { openFirstNameEdit(client.id) }}
                                             />
                                         </HStack>
                                     </Td>
@@ -272,7 +262,7 @@ function ClientPage() {
                                             <IconButton
                                                 aria-label='Edit Name'
                                                 icon={<EditIcon />}
-                                                onClick={() => openLastNameEdit(client.id)}
+                                                onClick={() => { openLastNameEdit(client.id) }}
                                             />
                                         </HStack>
                                     </Td>
@@ -284,24 +274,24 @@ function ClientPage() {
                                             <IconButton
                                                 aria-label='Change Schedule'
                                                 icon={<EditIcon />}
-                                                onClick={() => openScheduleEdit(client.id)}
+                                                onClick={() => { openScheduleEdit(client.id) }}
                                             />
                                         </HStack>
                                     </Td>
                                     <Td>
-                                        <Button colorScheme='green' onClick={() => openEditMaxesDialog(client)}>
+                                        <Button colorScheme='green' onClick={() => { openEditMaxesDialog(client) }}>
                                             Edit Maxes
                                         </Button>
                                     </Td>
                                     <Td>
-                                        <Button 
-                                            onClick={() => onClickDelete(client)}
+                                        <Button
+                                            onClick={() => { onClickDelete(client) }}
                                             colorScheme='red'>
                                             Delete Client
                                         </Button>
                                     </Td>
                                 </Tr>
-                            )
+                          )
                         })}
                     </Tbody>
                 </Table>
@@ -317,9 +307,9 @@ function ClientPage() {
                             <Button onClick={deleteDialog.onClose}>
                                 Cancel
                             </Button>
-                            <Button 
-                                colorScheme='red' 
-                                onClick={() => deleteClient()} 
+                            <Button
+                                colorScheme='red'
+                                onClick={() => { deleteClient() }}
                                 ml={3}>
                                 Delete
                             </Button>
@@ -339,23 +329,23 @@ function ClientPage() {
                     <ModalBody>
                         <FormControl>
                             <FormLabel>First Name</FormLabel>
-                            <Input type="text" onChange={(event) => setNewFirstName(event.target.value)}/>
+                            <Input type="text" onChange={(event) => { setNewFirstName(event.target.value) }}/>
                             <FormLabel>Last Name</FormLabel>
-                            <Input type="text" onChange={(event) => setNewLastName(event.target.value)}/>
+                            <Input type="text" onChange={(event) => { setNewLastName(event.target.value) }}/>
                             <FormLabel>Email</FormLabel>
-                            <Input type="text" onChange={(event) => setNewEmail(event.target.value)}/>
+                            <Input type="text" onChange={(event) => { setNewEmail(event.target.value) }}/>
                             <FormLabel>Schedule</FormLabel>
-                            <Select placeholder='Select name' onChange={(event) => setNewScheduleId(event.target.value)}>
+                            <Select placeholder='Select name' onChange={(event) => { setNewScheduleId(event.target.value) }}>
                                 {scheduleList.map((s, index) => {
-                                    return(
+                                  return (
                                         <option key={index} value={s.Id}>{s.Name}</option>
-                                    )
+                                  )
                                 })}
                             </Select>
-                            <Button ref={cancelRef} onClick={onClose}>
+                            <Button ref={cancelRef} onClick={onClose} mt={5}>
                                 Cancel
                             </Button>
-                            <Button colorScheme='green' onClick={addClient} ml={3}>
+                            <Button colorScheme='green' onClick={addClient} ml={3} mt={5}>
                                 Submit
                             </Button>
                         </FormControl>
@@ -369,13 +359,13 @@ function ClientPage() {
                     <ModalHeader>Edit Maxes for {activeClient.firstName} {activeClient.lastName}</ModalHeader>
                     <ModalBody>
                         <FormControl>
-                            {activeClient.maxes && activeClient.maxes.map((max, index) => {
-                                return(
+                            {activeClient.maxes?.map((max, index) => {
+                              return (
                                     <Box key={index}>
                                         <FormLabel>{max.name}</FormLabel>
-                                        <Input onChange={(event) => updateMax(event, index)} type="number" placeholder={max.weight.toString()} mb='20px'/>
+                                        <Input onChange={(event) => { updateMax(event, index) }} type="number" placeholder={max.weight.toString()} mb='20px'/>
                                     </Box>
-                                )
+                              )
                             })}
                             <Button colorScheme='red' ref={cancelRef} onClick={maxesDialog.onClose} mt='20px'>
                                 Cancel
@@ -395,11 +385,11 @@ function ClientPage() {
                     <ModalHeader>Select exercise name</ModalHeader>
                     <ModalBody>
                         <FormControl>
-                            <Select placeholder='Select name' onChange={(event) => setNewMaxName(event.target.value)}>
+                            <Select placeholder='Select name' onChange={(event) => { setNewMaxName(event.target.value) }}>
                                 {exerciseRefs.map((ex, index) => {
-                                    return(
+                                  return (
                                         <option key={index} value={ex.name}>{ex.name}</option>
-                                    )
+                                  )
                                 })}
                             </Select>
                             <Button colorScheme='red' ref={cancelRef} onClick={newMaxNameDialog.onClose} mt='20px'>
@@ -412,8 +402,8 @@ function ClientPage() {
                     </ModalBody>
                 </ModalContent>
             </Modal>
-            <EditFirstNameModal 
-                client={activeClient} 
+            <EditFirstNameModal
+                client={activeClient}
                 editFirstNameDialog={editFirstNameDialog}
                 setNewName={updateFirstName}/>
             <EditLastNameModal
@@ -426,7 +416,7 @@ function ClientPage() {
                 editScheduleDialog={editScheduleDialog}
                 setSchedule={updateSchedule}/>
         </Flex>
-    )
+  )
 }
 
 export default ClientPage

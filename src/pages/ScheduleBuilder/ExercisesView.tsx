@@ -1,55 +1,54 @@
-import { AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Box, Heading, VStack, HStack, Text, Table, TableContainer, Tr, Th, Tbody, Thead, Td, Editable, EditablePreview, EditableTextarea, EditableInput, NumberInput, NumberInputField, Button, useDisclosure, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, RadioGroup, Stack, Radio} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { Exercise, ExerciseReference } from "../../types/types";
-import { ExerciseView } from "./ExerciseView";
-import { addExercise } from "../../features/workoutScheduleSlice"
-import { AddExercisePayload } from "../../types/PayloadTypes";
-import DataPersistence from "../../services/DataPersistence";
+import { AccordionItem, Text, Table, TableContainer, Tr, Th, Tbody, Thead, NumberInput, NumberInputField, Button, useDisclosure, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, RadioGroup, Stack, Radio, Box } from '@chakra-ui/react'
+import React, { type ReactElement, useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { type ExerciseReference } from '../../types/types'
+import { ExerciseView } from './ExerciseView'
+import { addExercise } from '../../features/workoutScheduleSlice'
+import { type AddExercisePayload } from '../../types/PayloadTypes'
+import DataPersistence from '../../services/DataPersistence'
 
-export default function ExercisesView(props:any) {
+export default function ExercisesView (props: any): ReactElement {
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
-    const { isOpen, onOpen, onClose } = useDisclosure()
+  const dataPersistence = new DataPersistence()
 
-    const dataPersistence = new DataPersistence()
+  const [newExerciseName, setNewExerciseName] = useState('')
+  const [newExerciseType, setNewExerciseType] = useState('1')
+  const [newSets, setNewSets] = useState(0)
+  const [newReps, setNewReps] = useState(0)
+  const [newMultiplier, setNewMultiplier] = useState(0)
+  const [exercises, setExercises] = useState<ExerciseReference[]>([])
 
-    const [newExerciseName, setNewExerciseName] = useState("");
-    const [newExerciseType, setNewExerciseType] = useState('1');
-    const [newSets, setNewSets] = useState(0);
-    const [newReps, setNewReps] = useState(0);
-    const [newMultiplier, setNewMultiplier] = useState(0);
-    const [exercises, setExercises] = useState<ExerciseReference[]>([])
+  useEffect(() => {
+    getExercises().catch(() => {})
+  }, [])
 
-    useEffect(() => {
-        getExercises()
-    }, [])
+  const getExercises = async (): Promise<void> => {
+    const exercises = await dataPersistence.getExercises()
+    setExercises(exercises)
+  }
 
-    const getExercises = async () => {
-        const exercises = await dataPersistence.getExercises()
-        setExercises(exercises)
+  const dispatch = useDispatch()
+
+  const addNewExercise = (): void => {
+    const payload: AddExercisePayload = {
+      exercise: {
+        Name: newExerciseName,
+        Multiplier: newMultiplier,
+        Sets: newSets,
+        Reps: newReps,
+        Type: Number(newExerciseType)
+      },
+      scheduleIndex: props.scheduleIndex,
+      blockIndex: props.blockIndex,
+      weekIndex: props.weekIndex,
+      dayIndex: props.dayIndex
     }
+    dispatch(addExercise(payload))
+    onClose()
+  }
 
-    const dispatch = useDispatch();
-
-    const addNewExercise = () => {
-        const payload: AddExercisePayload = {
-            exercise: {
-                Name: newExerciseName,
-                Multiplier: newMultiplier,
-                Sets: newSets,
-                Reps: newReps,
-                Type: Number(newExerciseType)
-            },
-            scheduleIndex: props.scheduleIndex,
-            blockIndex: props.blockIndex,
-            weekIndex: props.weekIndex,
-            dayIndex: props.dayIndex
-        }
-        dispatch(addExercise(payload))
-        onClose();
-    }
-
-    return(
+  return (
         <Box>
             <AccordionItem key={props.index}>
                 <TableContainer>
@@ -65,17 +64,17 @@ export default function ExercisesView(props:any) {
                         </Thead>
                         <Tbody>
                             {props.exercises.map((exercise: any, index: number) => {
-                                return(
-                                    <ExerciseView 
+                              return (
+                                    <ExerciseView
                                     key={index}
-                                    exercise={exercise} 
+                                    exercise={exercise}
                                     index={index}
                                     scheduleIndex={props.scheduleIndex}
                                     workoutIndex={props.workoutIndex}
                                     blockIndex={props.blockIndex}
                                     weekIndex={props.weekIndex}
                                     dayIndex={props.dayIndex}/>
-                                );
+                              )
                             })}
                         </Tbody>
                     </Table>
@@ -89,32 +88,32 @@ export default function ExercisesView(props:any) {
                     <ModalCloseButton />
                     <ModalBody>
                         <Text mb='8px'>Name:</Text>
-                        <Select placeholder='Select name' onChange={(event) => setNewExerciseName(event.target.value)}>
+                        <Select placeholder='Select name' onChange={(event) => { setNewExerciseName(event.target.value) }}>
                             {exercises.map((ex, index) => {
-                                return(
+                              return (
                                     <option key={index} value={ex.name}>{ex.name}</option>
-                                )
+                              )
                             })}
                         </Select>
                         <Text mb='8px'>Sets:</Text>
                         <NumberInput>
                             <NumberInputField
                                 value={newSets}
-                                onChange={event => setNewSets(Number(event.target.value))}/>
+                                onChange={event => { setNewSets(Number(event.target.value)) }}/>
                         </NumberInput>
                         <Text mb='8px'>Reps:</Text>
                         <NumberInput>
                             <NumberInputField
                                 type="number"
                                 value={newReps}
-                                onChange={event => setNewReps(Number(event.target.value))}/>
+                                onChange={event => { setNewReps(Number(event.target.value)) }}/>
                         </NumberInput>
                         <Text mb='8px'>Multiplier:</Text>
                         <NumberInput>
                             <NumberInputField
                                 type="number"
                                 value={newMultiplier}
-                                onChange={event => setNewMultiplier(Number(event.target.value))}/>
+                                onChange={event => { setNewMultiplier(Number(event.target.value)) }}/>
                         </NumberInput>
                         <RadioGroup onChange={setNewExerciseType} value={newExerciseType}>
                             <Stack direction='row'>
@@ -129,5 +128,5 @@ export default function ExercisesView(props:any) {
                 </ModalContent>
             </Modal>
         </Box>
-    )
+  )
 }

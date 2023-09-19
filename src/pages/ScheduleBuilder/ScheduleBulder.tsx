@@ -1,105 +1,100 @@
-import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
-import { Box, Text, Button, HStack, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Tab, TabList, TabPanel, TabPanels, Tabs, Tag, TagLabel, TagRightIcon, useDisclosure, Icon, Input } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../app/Store";
-import AddNewWorkout from "../../components/AddNewWorkout";
-import { addSchedule, deleteSchedule, setInitialSchedules } from "../../features/workoutScheduleSlice";
-import DataPersistence from "../../services/DataPersistence";
-import { Block, Day, Week, WorkoutSchedule } from "../../types/types";
-import ScheduleView from "./ScheduleView";
-import {v4 as uuidv4} from 'uuid';
-import { DeleteSchedulePayload } from "../../types/PayloadTypes";
+import { AddIcon } from '@chakra-ui/icons'
+import { Box, Text, Button, HStack, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, Input } from '@chakra-ui/react'
+import React, { type ReactElement, useEffect, useState } from 'react'
+import { type TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+import { type RootState } from '../../app/Store'
+import AddNewWorkout from '../../components/AddNewWorkout'
+import { addSchedule, setInitialSchedules } from '../../features/workoutScheduleSlice'
+import DataPersistence from '../../services/DataPersistence'
+import { type Block, type Day, type Week, type WorkoutSchedule } from '../../types/types'
+import ScheduleView from './ScheduleView'
+import { v4 as uuidv4 } from 'uuid'
 
+export default function ScheduleBuilder (): ReactElement {
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
-export default function ScheduleBuilder() {
+  const [addNewWorkoutToggle, setAddNewWorkoutToggle] = useState(false)
+  const [showExistingWorkoutToggle, setShowExistingWorkoutToggle] = useState(false)
+  const [currentlyShownWorkoutIndex, setCurrentlyShownWorkoutIndex] = useState(-1)
+  const [newScheduleName, setNewScheduleName] = useState('')
 
-    const { isOpen, onOpen, onClose } = useDisclosure()
+  const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector
+  const dispatch = useDispatch()
 
-    const [addNewWorkoutToggle, setAddNewWorkoutToggle] = useState(false);
-    const [showExistingWorkoutToggle, setShowExistingWorkoutToggle] = useState(false);
-    const [currentlyShownWorkoutIndex, setCurrentlyShownWorkoutIndex] = useState(-1);
-    const [newScheduleName, setNewScheduleName] = useState("");
+  const existingWorkouts: WorkoutSchedule[] = useTypedSelector((state) => state.workoutSchedule.Schedules)
 
-    const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector;
-    const testWorkout = useTypedSelector((state) => state.workoutSchedule.Schedules[currentlyShownWorkoutIndex]);
-    const dispatch = useDispatch();
+  useEffect(() => {
+    const dataPersistence = new DataPersistence()
+    dataPersistence.getSchedules().then(response => {
+      dispatch(setInitialSchedules(response))
+    }).catch(() => {})
+  }, [])
 
-    const existingWorkouts: WorkoutSchedule[] = useTypedSelector((state) => state.workoutSchedule.Schedules);
+  const getScheduleButtonTheme = (index: number): string => {
+    if (index === currentlyShownWorkoutIndex) {
+      return 'green'
+    } else return 'gray'
+  }
 
-    useEffect(() => {
-        const dataPersistence = new DataPersistence();
-        dataPersistence.getSchedules().then(response => {
-            dispatch(setInitialSchedules(response));
-        });
-    }, []);
+  const selectExistingWorkout = (index: number): void => {
+    setCurrentlyShownWorkoutIndex(index)
+    setShowExistingWorkoutToggle(true)
+  }
 
-    const getScheduleButtonTheme = (index: number) => {
-        if (index == currentlyShownWorkoutIndex) {
-            return 'green';
-        }
-        else return 'gray';
+  const onConfirmAddSchedule = (): void => {
+    const id = uuidv4()
+    const newDay: Day = {
+      Exercises: []
     }
-
-    const selectExistingWorkout = (index: number) => {
-        setCurrentlyShownWorkoutIndex(index);
-        setShowExistingWorkoutToggle(true);
+    const newWeek: Week = {
+      Days: [newDay, newDay, newDay]
     }
-
-    const onConfirmAddSchedule = () => {
-        const id = uuidv4();
-        const newDay: Day = {
-            Exercises: []
-        }
-        const newWeek: Week = {
-            Days: [newDay, newDay, newDay]
-        }
-        const newBlock: Block = {
-            Weeks: [newWeek]
-        }
-        const newSchedule: WorkoutSchedule = {
-            Id: id,
-            Name: newScheduleName,
-            Blocks: [newBlock],
-            CurrentBlock: 0,
-            CurrentWeek: 0
-        }
-        dispatch(addSchedule(newSchedule));
-        onClose();
+    const newBlock: Block = {
+      Weeks: [newWeek]
     }
-
-    const resetCurrentScheduleIndex = () => {
-        setCurrentlyShownWorkoutIndex(-1);
+    const newSchedule: WorkoutSchedule = {
+      Id: id,
+      Name: newScheduleName,
+      Blocks: [newBlock],
+      CurrentBlock: 0,
+      CurrentWeek: 0
     }
+    dispatch(addSchedule(newSchedule))
+    onClose()
+  }
 
-    return(
+  const resetCurrentScheduleIndex = (): void => {
+    setCurrentlyShownWorkoutIndex(-1)
+  }
+
+  return (
         <Box>
             <HStack mt={5} ml={5}>
                 {existingWorkouts.map((workout, index) => {
-                    return(
+                  return (
                         <Button
                         colorScheme={getScheduleButtonTheme(index)}
                         key={index}
                         onClick={e => {
-                            selectExistingWorkout(index);
-                            setAddNewWorkoutToggle(false);
+                          selectExistingWorkout(index)
+                          setAddNewWorkoutToggle(false)
                         }}>
                             {workout.Name}
                         </Button>
-                    )
+                  )
                 })}
                 <Button onClick={onOpen}>
                     <Text mr={2}>Add New Schedule</Text>
                     <AddIcon/>
                 </Button>
             </HStack>
-            {addNewWorkoutToggle && 
+            {addNewWorkoutToggle &&
                 <AddNewWorkout />
             }
             {showExistingWorkoutToggle &&
-                existingWorkouts[currentlyShownWorkoutIndex] != null && 
-                <ScheduleView 
-                workout={existingWorkouts[currentlyShownWorkoutIndex]} 
+                existingWorkouts[currentlyShownWorkoutIndex] != null &&
+                <ScheduleView
+                workout={existingWorkouts[currentlyShownWorkoutIndex]}
                 scheduleIndex={currentlyShownWorkoutIndex}
                 resetIndex={resetCurrentScheduleIndex}/>
             }
@@ -112,7 +107,7 @@ export default function ScheduleBuilder() {
                         <Text mb='8px'>What do you want to name the new schedule?</Text>
                         <Input
                             value={newScheduleName}
-                            onChange={event => setNewScheduleName(event.target.value)}
+                            onChange={event => { setNewScheduleName(event.target.value) }}
                             size='sm'
                         />
                     </ModalBody>
@@ -122,5 +117,5 @@ export default function ScheduleBuilder() {
                 </ModalContent>
             </Modal>
         </Box>
-    )
+  )
 }
