@@ -23,7 +23,7 @@ export default function ExercisesView (props: any): ReactElement {
     getExercises().catch(() => {})
   }, [])
 
-  const getExercises = async (): Promise<void> => {
+  async function getExercises (): Promise<void> {
     const exercises = await dataPersistence.getExercises()
     setExercises(exercises)
   }
