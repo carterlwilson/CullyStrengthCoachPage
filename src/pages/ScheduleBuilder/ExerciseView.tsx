@@ -69,6 +69,11 @@ export function ExerciseView (props: any): ReactElement {
                     </Text>
                 </Td>
                 <Td>
+                    <Text>
+                        {props.exercise.MaxReference}
+                    </Text>
+                </Td>
+                <Td>
                     <Button onClick={onOpen} ml={3}>Edit</Button>
                     <Button onClick={removeExercise} ml={3}>Delete</Button>
                 </Td>

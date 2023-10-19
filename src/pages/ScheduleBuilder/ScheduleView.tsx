@@ -43,7 +43,7 @@ export default function ScheduleView (props: any): ReactElement {
   }
 
   const getWeeksMax = (blockNum: number): number => {
-    return props.workout.Blocks[blockNum].Weeks.length
+    return props.workout?.Blocks[blockNum]?.Weeks?.length
   }
 
   const _deleteSchedule = (): void => {

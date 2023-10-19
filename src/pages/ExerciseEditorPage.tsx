@@ -1,8 +1,8 @@
 import React, { type ReactElement, useEffect, useState } from 'react'
-import { Box, Button, Flex, FormControl, FormLabel, Input, useDisclosure, Text, Modal, ModalBody, ModalContent, ModalOverlay, SimpleGrid, Card, CardHeader, Heading, CardBody, IconButton, Spacer } from '@chakra-ui/react'
+import { Box, Button, Flex, FormControl, FormLabel, Input, useDisclosure, Text, Modal, ModalBody, ModalContent, ModalOverlay, SimpleGrid, Card, CardHeader, Heading, CardBody, IconButton, Spacer, CardFooter, ModalHeader, ModalCloseButton } from '@chakra-ui/react'
 import DataPersistence from '../services/DataPersistence'
 import { type ExerciseReference, type ExerciseType } from '../types/types'
-import { DeleteIcon } from '@chakra-ui/icons'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 
 function ExerciseEditorPage (): ReactElement {
   const dataPersistence = new DataPersistence()
@@ -11,6 +11,7 @@ function ExerciseEditorPage (): ReactElement {
   const [newExerciseName, setNewExerciseName] = useState<string>('')
 
   const addExercise = useDisclosure()
+  const editExercise = useDisclosure()
 
   const getExercises = (): void => {
     dataPersistence.getExercises().then(response => {
@@ -32,6 +33,11 @@ function ExerciseEditorPage (): ReactElement {
     dataPersistence.deleteExercise(id).then(() => { getExercises() }).catch(() => {})
   }
 
+  const getType = (type: number): string => {
+    if (type === 1) return 'Primary'
+    else return 'Accessory'
+  }
+
   useEffect(() => {
     getExercises()
   })
@@ -45,13 +51,17 @@ function ExerciseEditorPage (): ReactElement {
                             <CardHeader>
                                 <Flex flexDirection={'row'}>
                                     <Heading size='md'>{ex.name}</Heading>
-                                    <Spacer />
-                                    <IconButton aria-label='Search database' icon={<DeleteIcon />} onClick={() => { deleteExercise(ex.id) }}/>
                                 </Flex>
+                                <Text>{getType(Number(ex.type))}</Text>
                             </CardHeader>
                             <CardBody>
                                 <Text>Whatever else we want here</Text>
                             </CardBody>
+                            <CardFooter>
+                                <IconButton aria-label='Delete Exercise' icon={<DeleteIcon />} onClick={() => { deleteExercise(ex.id) }}/>
+                                    <Spacer />
+                                <IconButton aria-label='Edit Exercise' icon={<EditIcon />} onClick={() => { editExercise.onOpen() }}/>
+                            </CardFooter>
                         </Card>
                   )
                 })}
@@ -74,6 +84,14 @@ function ExerciseEditorPage (): ReactElement {
                         </FormControl>
                     </ModalBody>
                 </ModalContent>
+            </Modal>
+            <Modal isOpen={editExercise.isOpen} onClose={editExercise.onClose}>
+              <ModalOverlay/>
+              <ModalContent>
+                <ModalHeader>Edit exercise</ModalHeader>
+                <ModalCloseButton/>
+                <ModalBody></ModalBody>
+              </ModalContent>
             </Modal>
         </Box>
   )

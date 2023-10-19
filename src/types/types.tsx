@@ -19,7 +19,8 @@ export type Exercise = {
     Multiplier: number,
     Sets: number,
     Reps: number,
-    Type: number
+    Type: number,
+    MaxReference: string
 }
 
 export type Week = {
@@ -47,7 +48,7 @@ export type Max = {
 export type ExerciseReference = {
     name: string,
     type: Number,
-    id: string
+    id: string,
 }
 
 export type ExerciseType = {

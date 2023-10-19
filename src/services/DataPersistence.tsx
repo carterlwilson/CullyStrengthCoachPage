@@ -58,7 +58,8 @@ export default class DataPersistence {
       Multiplier: exerciseData.Multiplier,
       Sets: exerciseData.Sets,
       Reps: exerciseData.Reps,
-      Type: exerciseData.Type
+      Type: exerciseData.Type,
+      MaxReference: exerciseData.MaxReference
     }
     return exercise
   }

@@ -15,6 +15,7 @@ export default function ExercisesView (props: any): ReactElement {
   const [newSets, setNewSets] = useState(0)
   const [newReps, setNewReps] = useState(0)
   const [newMultiplier, setNewMultiplier] = useState(0)
+  const [newMaxReference, setNewMaxReference] = useState('')
   const [exercises, setExercises] = useState<ExerciseReference[]>([])
 
   useEffect(() => {
@@ -34,7 +35,8 @@ export default function ExercisesView (props: any): ReactElement {
         Multiplier: newMultiplier,
         Sets: newSets,
         Reps: newReps,
-        Type: Number(newExerciseType)
+        Type: Number(newExerciseType),
+        MaxReference: newMaxReference
       },
       scheduleIndex: props.scheduleIndex,
       blockIndex: props.blockIndex,
@@ -57,6 +59,8 @@ export default function ExercisesView (props: any): ReactElement {
                                 <Th>Reps</Th>
                                 <Th>Multiplier</Th>
                                 <Th>Type</Th>
+                                <Th>Max Reference</Th>
+                                <Th></Th>
                             </Tr>
                         </Thead>
                         <Tbody>
@@ -118,6 +122,13 @@ export default function ExercisesView (props: any): ReactElement {
                                 <Radio value='2'>Accessory</Radio>
                             </Stack>
                         </RadioGroup>
+                        <Select placeholder='Select max reference' onChange={(event) => { setNewMaxReference(event.target.value) }}>
+                            {exercises.map((ex, index) => {
+                              return (
+                                    <option key={index} value={ex.name}>{ex.name}</option>
+                              )
+                            })}
+                        </Select>
                     </ModalBody>
                     <ModalFooter>
                         <Button onClick={addNewExercise}>Save</Button>

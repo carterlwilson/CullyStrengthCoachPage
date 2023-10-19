@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 import { store } from './app/Store'
 import ExerciseEditorPage from './pages/ExerciseEditorPage'
 import React, { type ReactElement } from 'react'
+import HomePage from './pages/homePage'
 
 function App (): ReactElement {
   return (
@@ -53,10 +54,10 @@ function App (): ReactElement {
 
             <Box w="100%" id='content-container'>
               <Routes>
-                <Route path='/' element={<ClientPage />} />
-                <Route path='/clients' element={<ClientPage />} />
-                <Route path='/schedule-builder' element={<ScheduleBuilder />} />
-                <Route path='/exercises' element={<ExerciseEditorPage />} />
+                <Route path='/' element={<HomePage />} />
+                <Route path='/clients' element={<HomePage />} />
+                <Route path='/schedule-builder' element={<HomePage />} />
+                <Route path='/exercises' element={<HomePage />} />
               </Routes>
             </Box>
           </Flex>
