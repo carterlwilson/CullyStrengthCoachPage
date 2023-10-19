@@ -6,7 +6,7 @@ export default class DataPersistence {
   firebaseConfig = {
     apiKey: 'AIzaSyBoQT4L3shuLfXGgQeQKR6jv2V0zA-Xnk0',
     authDomain: 'cullyfitness.firebaseapp.com',
-    projectId: 'cullyfitness'
+    projectId: 'test'
   }
 
   firebaseApp: FirebaseApp
