@@ -1,12 +1,16 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app'
-import { getFirestore, collection, getDocs, setDoc, addDoc, type DocumentData, doc, deleteDoc } from 'firebase/firestore'
+import { getFirestore, collection, getDocs, setDoc, addDoc, type DocumentData, doc, deleteDoc, getDoc } from 'firebase/firestore'
 import { type Block, type Client, type Day, type Exercise, type ExerciseReference, type ExerciseType, type Iteration, type Max, type Week, type WorkoutSchedule, type WorkoutScheduleState } from '../types/types'
 
 export default class DataPersistence {
   firebaseConfig = {
-    apiKey: 'AIzaSyBoQT4L3shuLfXGgQeQKR6jv2V0zA-Xnk0',
-    authDomain: 'cullyfitness.firebaseapp.com',
-    projectId: 'test'
+    apiKey: 'AIzaSyCfDq2attDqWMrxVXrJxLtFdP3rSXTZFXo',
+    authDomain: 'cully-strength.firebaseapp.com',
+    projectId: 'cully-strength',
+    storageBucket: 'cully-strength.appspot.com',
+    messagingSenderId: '374950825055',
+    appId: '1:374950825055:web:c6452a92677096d8bd1fea',
+    measurementId: 'G-R739SFTWWT'
   }
 
   firebaseApp: FirebaseApp
@@ -92,6 +96,13 @@ export default class DataPersistence {
       block.Weeks.push(this.buildWeekFromApiResponse(week))
     })
     return block
+  }
+
+  async getUserRole (username: string): Promise<number> {
+    const db = getFirestore(this.firebaseApp)
+    const docRef = doc(db, 'Roles', username)
+    const role = await getDoc(docRef)
+    return role.data()?.Role
   }
 
   async getSchedules (): Promise<WorkoutSchedule[]> {

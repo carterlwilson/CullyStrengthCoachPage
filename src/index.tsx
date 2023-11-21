@@ -1,15 +1,55 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
-import App from './App'
 import reportWebVitals from './reportWebVitals'
+import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import LoginPage from './pages/LoginPage'
+import ClientPage from './pages/ClientPage/ClientPage'
+import ExerciseEditorPage from './pages/ExerciseEditorPage'
+import HomePage from './pages/HomePage/homePage'
+import ScheduleBuilder from './pages/ScheduleBuilder/ScheduleBulder'
+import { ChakraProvider } from '@chakra-ui/react'
+import MaxesPage from './pages/MaxesPage'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 )
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <LoginPage />,
+    errorElement: <LoginPage />
+  },
+  {
+    path: '/home',
+    element: <HomePage />,
+    children: [
+      {
+        path: 'clients',
+        element: <ClientPage />
+      },
+      {
+        path: 'schedule-builder',
+        element: <ScheduleBuilder />
+      },
+      {
+        path: 'exercises',
+        element: <ExerciseEditorPage />
+      },
+      {
+        path: 'max-editor',
+        element: <MaxesPage />
+      }
+    ]
+  }
+])
+
 root.render(
   <React.StrictMode>
-    <App />
+    <ChakraProvider>
+      <RouterProvider router={router} />
+    </ChakraProvider>
   </React.StrictMode>
 )
 

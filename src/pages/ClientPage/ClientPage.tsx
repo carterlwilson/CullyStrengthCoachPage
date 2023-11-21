@@ -121,7 +121,6 @@ function ClientPage (): ReactElement {
   }
 
   const deleteClient = (): void => {
-    console.log('deleting')
     deleteDialog.onClose()
     dataPersistence.deleteClient(clientToDelete)
       .then(success => {
@@ -196,7 +195,7 @@ function ClientPage (): ReactElement {
       .then(response => {
         setClientList(response)
       })
-      .catch(() => {})
+      .catch((error: any) => { console.log(error) })
 
     dataPersistence.getExercises()
       .then(response => {
@@ -209,7 +208,7 @@ function ClientPage (): ReactElement {
         setScheduleList(response)
       })
       .catch(() => {})
-  })
+  }, [])
 
   return (
         <Flex direction="column" mt={5}>
