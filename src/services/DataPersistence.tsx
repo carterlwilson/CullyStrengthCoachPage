@@ -16,7 +16,9 @@ export default class DataPersistence {
   firebaseApp: FirebaseApp
 
   constructor () {
+    console.log('initializing firebase')
     this.firebaseApp = initializeApp(this.firebaseConfig)
+    console.log('finished initializing')
   }
 
   buildClientFromApiResponse (data: DocumentData, id: string): Client {
