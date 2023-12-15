@@ -42,6 +42,7 @@ export default function LoginPage (): ReactElement {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
+        console.log('logged in')
         navigate('/clients')
         // ...
       })
