@@ -12,6 +12,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import MaxesPage from './pages/MaxesPage'
 
 const root = ReactDOM.createRoot(
+  // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
   document.getElementById('root') as HTMLElement
 )
 

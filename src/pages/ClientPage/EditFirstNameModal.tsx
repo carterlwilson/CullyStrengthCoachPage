@@ -1,6 +1,7 @@
 import React, { type ReactElement, useState } from 'react'
 import { Button, FormControl, FormLabel, Input, Modal, ModalBody, ModalContent } from '@chakra-ui/react'
 import DataPersistence from '../../services/DataPersistence'
+import { type Client } from '../../types/types'
 
 function EditFirstNameModal (props: any): ReactElement {
   const dataPersistence = new DataPersistence()
@@ -8,7 +9,7 @@ function EditFirstNameModal (props: any): ReactElement {
   const [editedName, setEditedName] = useState('')
 
   const updateName = (): void => {
-    const updatedClient = { ...props.client }
+    const updatedClient: Client = { ...props.client }
     updatedClient.firstName = editedName
     dataPersistence.updateClient(updatedClient).catch((() => {}))
     props.editFirstNameDialog.onClose()

@@ -1,7 +1,7 @@
 import { Button, FormControl, Modal, ModalBody, ModalContent, Select } from '@chakra-ui/react'
 import React, { type ReactElement, useState } from 'react'
 import DataPersistence from '../../services/DataPersistence'
-import { type WorkoutSchedule } from '../../types/types'
+import { type Client, type WorkoutSchedule } from '../../types/types'
 
 function EditScheduleModal (props: any): ReactElement {
   const dataPersistence = new DataPersistence()
@@ -11,7 +11,7 @@ function EditScheduleModal (props: any): ReactElement {
   const scheduleListCopy = [...props.scheduleList] as WorkoutSchedule[]
 
   const updateSchedule = (): void => {
-    const updatedClient = { ...props.client }
+    const updatedClient: Client = { ...props.client }
     updatedClient.scheduleId = updatedScheduleId
     dataPersistence.updateClient(updatedClient).catch(() => {})
     props.editScheduleDialog.onClose()

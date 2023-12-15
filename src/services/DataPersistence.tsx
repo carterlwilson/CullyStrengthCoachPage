@@ -1,5 +1,5 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app'
-import { getFirestore, collection, getDocs, setDoc, addDoc, type DocumentData, doc, deleteDoc, getDoc } from 'firebase/firestore'
+import { getFirestore, collection, getDocs, setDoc, addDoc, type DocumentData, doc, deleteDoc, getDoc, type QueryDocumentSnapshot } from 'firebase/firestore'
 import { type Block, type Client, type Day, type Exercise, type ExerciseReference, type ExerciseType, type Iteration, type Max, type Week, type WorkoutSchedule, type WorkoutScheduleState } from '../types/types'
 
 export default class DataPersistence {
@@ -112,7 +112,7 @@ export default class DataPersistence {
     const schedulesCollection = collection(db, 'Schedules')
     const schedulesSnapshot = await getDocs(schedulesCollection)
     const scheduleList: WorkoutSchedule[] = []
-    schedulesSnapshot.docs.forEach((s: any) => {
+    schedulesSnapshot.docs.forEach((s: QueryDocumentSnapshot) => {
       scheduleList.push(this.buildScheduleFromApiResponse(s.data()))
     })
     return scheduleList
