@@ -29,6 +29,7 @@ export default function LoginPage (): ReactElement {
   }, [])
 
   onAuthStateChanged(auth, (user) => {
+    console.log('auth state changed')
     if (user?.email != null) {
       window.localStorage.setItem('username', user.email)
       navigate('/home')
