@@ -21,6 +21,7 @@ export default function LoginPage (): ReactElement {
   const toast = useToast()
 
   useEffect(() => {
+    console.log('starting page')
     dataPersistence.getSchedules()
       .then(response => {
         setScheduleList(scheduleList)
@@ -40,10 +41,10 @@ export default function LoginPage (): ReactElement {
   })
 
   const login = (): void => {
+    console.log('logging in')
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
-        console.log('logged in')
         navigate('/clients')
         // ...
       })
