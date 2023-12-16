@@ -33,6 +33,12 @@ function ExerciseEditorPage (): ReactElement {
     dataPersistence.deleteExercise(id).then(() => { getExercises() }).catch(() => {})
   }
 
+  const submitDisabled = (): boolean => {
+    if (newExerciseName === '') {
+      return true
+    } else return false
+  }
+
   const getType = (type: number): string => {
     if (type === 1) return 'Primary'
     else return 'Accessory'
@@ -78,7 +84,7 @@ function ExerciseEditorPage (): ReactElement {
                         <FormControl>
                         <FormLabel>Exercise Name</FormLabel>
                             <Input type="text" onChange={(event) => { setNewExerciseName(event.target.value) }}/>
-                            <Button onClick={addNewExercise} mt={5}>
+                            <Button onClick={addNewExercise} mt={5} isDisabled={submitDisabled()}>
                                 Submit
                             </Button>
                         </FormControl>

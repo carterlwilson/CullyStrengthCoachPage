@@ -50,6 +50,12 @@ export default function LoginPage (): ReactElement {
       })
       .catch((error) => {
         console.log('error logging in', error)
+        toast({
+          description: 'Error logging in, make sure you are using the correct email and password',
+          status: 'error',
+          duration: 9000,
+          isClosable: true
+        })
       })
   }
   /*

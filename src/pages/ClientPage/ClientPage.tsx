@@ -190,6 +190,12 @@ function ClientPage (): ReactElement {
     setActiveClient(updatedActiveClient)
   }
 
+  const newClientSubmitDisabled = (): boolean => {
+    if (newFirstName === '' || newLastName === '' || newEmail === '' || newScheduleId === '') {
+      return true
+    } else return true
+  }
+
   useEffect(() => {
     dataPersistence.getClients()
       .then(response => {
@@ -334,7 +340,7 @@ function ClientPage (): ReactElement {
                             <Button ref={cancelRef} onClick={onClose} mt={5}>
                                 Cancel
                             </Button>
-                            <Button colorScheme='green' onClick={addClient} ml={3} mt={5}>
+                            <Button isDisabled={newClientSubmitDisabled()} colorScheme='green' onClick={addClient} ml={3} mt={5}>
                                 Submit
                             </Button>
                         </FormControl>
