@@ -1,5 +1,5 @@
 import { Box, Button, Flex, FormControl, FormLabel, Input, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, Text, Modal, ModalHeader, ModalBody, ModalContent, ModalOverlay, IconButton, Select, HStack, useToast } from '@chakra-ui/react'
-import React, { type ReactElement, useEffect, useState } from 'react'
+import React, { type ReactElement, useEffect, useState, type ChangeEvent } from 'react'
 import DataPersistence from '../../services/DataPersistence'
 import { type Client, type ExerciseReference, type Max, type WorkoutSchedule } from '../../types/types'
 import { v4 as uuidv4 } from 'uuid'
@@ -7,6 +7,7 @@ import { AddIcon, EditIcon } from '@chakra-ui/icons'
 import EditFirstNameModal from './EditFirstNameModal'
 import EditLastNameModal from './EditLastNameModal'
 import EditScheduleModal from './EditScheduleModal'
+import EditEmailModal from './EditEmailModal'
 
 function ClientPage (): ReactElement {
   const initialClient: Client = {
@@ -29,12 +30,14 @@ function ClientPage (): ReactElement {
   const [activeClient, setActiveClient] = useState(initialClient)
   const [clientToDelete, setClientToDelete] = useState(initialClient)
   const [exerciseRefs, setExerciseRefs] = useState<ExerciseReference[]>([])
+  const [clientsFile, setClientsFile] = useState<File>()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const deleteDialog = useDisclosure()
   const maxesDialog = useDisclosure()
   const newMaxNameDialog = useDisclosure()
   const editFirstNameDialog = useDisclosure()
   const editLastNameDialog = useDisclosure()
+  const editEmailDialog = useDisclosure()
   const editScheduleDialog = useDisclosure()
   const cancelRef = React.useRef() as any
   const toast = useToast()
@@ -164,6 +167,14 @@ function ClientPage (): ReactElement {
     editLastNameDialog.onOpen()
   }
 
+  const openEmailEdit = (id: string): void => {
+    const matchingClient = clientList.find(c => c.id === id)
+    if (matchingClient != null) {
+      setActiveClient(matchingClient)
+    }
+    editEmailDialog.onOpen()
+  }
+
   const openScheduleEdit = (id: string): void => {
     const matchingClient = clientList.find(c => c.id === id)
     if (matchingClient != null) {
@@ -184,6 +195,12 @@ function ClientPage (): ReactElement {
     setActiveClient(updatedActiveClient)
   }
 
+  const updateEmail = (email: string): void => {
+    const updatedActiveClient = { ...activeClient }
+    updatedActiveClient.email = email
+    setActiveClient(updatedActiveClient)
+  }
+
   const updateSchedule = (scheduleId: string): void => {
     const updatedActiveClient = { ...activeClient }
     updatedActiveClient.scheduleId = scheduleId
@@ -194,6 +211,58 @@ function ClientPage (): ReactElement {
     if (newFirstName === '' || newLastName === '' || newEmail === '' || newScheduleId === '') {
       return true
     } else return true
+  }
+
+  const handleClientsFileInput = (e: ChangeEvent<HTMLInputElement>): void => {
+    if (e.currentTarget.files != null) {
+      setClientsFile(e.currentTarget.files[0])
+    }
+  }
+
+  const onSubmitClientsFile = (): void => {
+    const reader = new FileReader()
+    reader.onloadend = (e: ProgressEvent) => {
+      if (reader.result != null) {
+        const stringResult = reader.result as string
+        const splitResult = stringResult.split('\r\n')
+        // const clientsToAdd = new Array<Client>()
+        splitResult.forEach((client) => {
+          const clientDataArray = client.split(',')
+          const benchMax: Max = {
+            name: 'BenchPress',
+            weight: parseInt(clientDataArray[2])
+          }
+          const squatMax: Max = {
+            name: 'Squat',
+            weight: parseInt(clientDataArray[4])
+          }
+          const deadliftMax: Max = {
+            name: 'Deadlift',
+            weight: parseInt(clientDataArray[3])
+          }
+          const OverheadMax: Max = {
+            name: 'Overhead Press',
+            weight: parseInt(clientDataArray[5])
+          }
+          const clientToAdd: Client = {
+            id: uuidv4(),
+            firstName: clientDataArray[0],
+            lastName: clientDataArray[1],
+            email: clientDataArray[6],
+            maxes: [benchMax, squatMax, deadliftMax, OverheadMax],
+            scheduleId: scheduleList[0].Id
+          }
+          dataPersistence.addNewClient(clientToAdd)
+            .then(success => {
+              setClientList(clientList.concat(clientToAdd))
+            })
+            .catch(error => {
+              console.log(error)
+            })
+        })
+      }
+    }
+    reader.readAsText(clientsFile as Blob)
   }
 
   useEffect(() => {
@@ -218,6 +287,16 @@ function ClientPage (): ReactElement {
 
   return (
         <Flex direction="column" mt={5}>
+            <Box mb={10}>
+              <Box>
+                <Text>The button below will let you upload a csv file to add clients.</Text>
+                <Text>WARNING: You probably do not want to use this. Text me (Carter) first so I can prep for it.</Text>
+              </Box>
+              <Input
+                name='Clients File'
+                type='file'
+                onChange={(e => { handleClientsFileInput(e) })}/>
+            </Box>
             <Button
                 w="100px"
                 ml="25px"
@@ -228,6 +307,7 @@ function ClientPage (): ReactElement {
                         <Tr>
                             <Th>First Name</Th>
                             <Th>Last Name</Th>
+                            <Th>Email</Th>
                             <Th>Schedule</Th>
                             <Th>Maxes</Th>
                             <Th>Remove</Th>
@@ -262,6 +342,17 @@ function ClientPage (): ReactElement {
                                         </HStack>
                                     </Td>
                                     <Td>
+                                      <HStack>
+                                        <Text>
+                                          {client.email}
+                                        </Text>
+                                        <IconButton
+                                          aria-label='Edit Email'
+                                          icon={<EditIcon />}
+                                          onClick={() => { openEmailEdit(client.id) }}/>
+                                      </HStack>
+                                    </Td>
+                                    <Td>
                                         <HStack>
                                             <Text>
                                                 {getScheduleNameFromId(client.scheduleId)}
@@ -291,6 +382,7 @@ function ClientPage (): ReactElement {
                     </Tbody>
                 </Table>
             </TableContainer>
+            <Button onClick={onSubmitClientsFile}>Submit</Button>
             <Modal
                 isOpen={deleteDialog.isOpen}
                 onClose={deleteDialog.onClose}>
@@ -405,6 +497,10 @@ function ClientPage (): ReactElement {
                 client={activeClient}
                 editLastNameDialog={editLastNameDialog}
                 setNewName={updateLastName}/>
+            <EditEmailModal
+                client={activeClient}
+                editEmailDialog={editEmailDialog}
+                setNewEmail={updateEmail}/>
             <EditScheduleModal
                 client={activeClient}
                 scheduleList={scheduleList}
