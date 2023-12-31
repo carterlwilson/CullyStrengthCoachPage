@@ -205,6 +205,10 @@ function ClientPage (): ReactElement {
     const updatedActiveClient = { ...activeClient }
     updatedActiveClient.scheduleId = scheduleId
     setActiveClient(updatedActiveClient)
+    const clientIndex = clientList.findIndex(client => client.id === updatedActiveClient.id)
+    const newList = structuredClone(clientList)
+    newList[clientIndex] = updatedActiveClient
+    setClientList(newList)
   }
 
   const newClientSubmitDisabled = (): boolean => {
