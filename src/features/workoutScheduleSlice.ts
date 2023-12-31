@@ -127,7 +127,9 @@ export const workoutScheduleSlice = createSlice({
       state
         .Schedules[action.payload.scheduleIndex]
         .CurrentWeek = action.payload.week
-      dataPersistence.updateSchedules(state).catch(() => {})
+      dataPersistence.updateSchedules(state)
+        .then(() => { })
+        .catch(() => { })
     }
   }
 })

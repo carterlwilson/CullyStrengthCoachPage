@@ -244,13 +244,21 @@ function ClientPage (): ReactElement {
             name: 'Overhead Press',
             weight: parseInt(clientDataArray[5])
           }
+          const frontSquatMax: Max = {
+            name: 'Front Squat',
+            weight: parseInt(clientDataArray[6])
+          }
+          const pushPressMax: Max = {
+            name: 'Push Press',
+            weight: parseInt(clientDataArray[7])
+          }
           const clientToAdd: Client = {
             id: uuidv4(),
             firstName: clientDataArray[0],
             lastName: clientDataArray[1],
-            email: clientDataArray[6],
-            maxes: [benchMax, squatMax, deadliftMax, OverheadMax],
-            scheduleId: scheduleList[0].Id
+            email: clientDataArray[8],
+            maxes: [benchMax, squatMax, deadliftMax, OverheadMax, frontSquatMax, pushPressMax],
+            scheduleId: scheduleList[3].Id
           }
           dataPersistence.addNewClient(clientToAdd)
             .then(success => {
@@ -296,6 +304,7 @@ function ClientPage (): ReactElement {
                 name='Clients File'
                 type='file'
                 onChange={(e => { handleClientsFileInput(e) })}/>
+              <Button onClick={onSubmitClientsFile}>Submit</Button>
             </Box>
             <Button
                 w="100px"
@@ -382,7 +391,6 @@ function ClientPage (): ReactElement {
                     </Tbody>
                 </Table>
             </TableContainer>
-            <Button onClick={onSubmitClientsFile}>Submit</Button>
             <Modal
                 isOpen={deleteDialog.isOpen}
                 onClose={deleteDialog.onClose}>
