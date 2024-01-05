@@ -214,7 +214,7 @@ function ClientPage (): ReactElement {
   const newClientSubmitDisabled = (): boolean => {
     if (newFirstName === '' || newLastName === '' || newEmail === '' || newScheduleId === '') {
       return true
-    } else return true
+    } else return false
   }
 
   const handleClientsFileInput = (e: ChangeEvent<HTMLInputElement>): void => {
