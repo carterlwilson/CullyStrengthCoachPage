@@ -1,6 +1,7 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app'
 import { getFirestore, collection, getDocs, setDoc, addDoc, type DocumentData, doc, deleteDoc, getDoc, type QueryDocumentSnapshot } from 'firebase/firestore'
 import { type Block, type Client, type Day, type Exercise, type ExerciseReference, type ExerciseType, type Iteration, type Max, type Week, type WorkoutSchedule, type WorkoutScheduleState } from '../types/types'
+import { v4 as uuidv4 } from 'uuid'
 
 export default class DataPersistence {
   firebaseConfig = {
@@ -60,6 +61,7 @@ export default class DataPersistence {
 
   buildExerciseFromApiResponse (exerciseData: any): Exercise {
     const exercise: Exercise = {
+      Id: exerciseData.Id ?? uuidv4(),
       Name: exerciseData.Name,
       Multiplier: exerciseData.Multiplier,
       Sets: exerciseData.Sets,

@@ -39,6 +39,14 @@ export type AddExercisePayload = {
     dayIndex: number
 }
 
+export type SetDailyExercisesPayload = {
+    exercises: Exercise[],
+    scheduleIndex: number,
+    blockIndex: number,
+    weekIndex: number,
+    dayIndex: number
+}
+
 export type DeleteExercisePayload = {
     scheduleIndex: number,
     blockIndex: number,

@@ -1,11 +1,13 @@
-import { AccordionItem, Text, Table, TableContainer, Tr, Th, Tbody, Thead, NumberInput, NumberInputField, Button, useDisclosure, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, RadioGroup, Stack, Radio, Box } from '@chakra-ui/react'
+import { AccordionItem, Text, NumberInput, NumberInputField, Button, useDisclosure, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, RadioGroup, Stack, Radio, Box, VStack } from '@chakra-ui/react'
 import React, { type ReactElement, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { type ExerciseReference } from '../../types/types'
+import { type Exercise, type ExerciseReference } from '../../types/types'
 import { ExerciseView } from './ExerciseView'
-import { addExercise } from '../../features/workoutScheduleSlice'
-import { type AddExercisePayload } from '../../types/PayloadTypes'
+import { addExercise, setDailyExercises } from '../../features/workoutScheduleSlice'
+import { type SetDailyExercisesPayload, type AddExercisePayload } from '../../types/PayloadTypes'
 import DataPersistence from '../../services/DataPersistence'
+import { v4 as uuidv4 } from 'uuid'
+import { Reorder } from 'framer-motion'
 
 export default function ExercisesView (props: any): ReactElement {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -17,6 +19,9 @@ export default function ExercisesView (props: any): ReactElement {
   const [newMultiplier, setNewMultiplier] = useState(0)
   const [newMaxReference, setNewMaxReference] = useState('')
   const [exercises, setExercises] = useState<ExerciseReference[]>([])
+  const [scheduledExercises, setScheduledExercises] = useState<Exercise[]>([])
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const dataPersistence = new DataPersistence()
@@ -26,11 +31,26 @@ export default function ExercisesView (props: any): ReactElement {
       }).catch(() => {})
   }, [])
 
-  const dispatch = useDispatch()
+  useEffect(() => {
+    setScheduledExercises(props.exercises as Exercise[])
+  }, [props.exercises])
+
+  const setNewExerciseOrder = (newOrder: Exercise[]): void => {
+    setScheduledExercises(newOrder)
+    const payload: SetDailyExercisesPayload = {
+      exercises: newOrder,
+      scheduleIndex: props.scheduleIndex,
+      blockIndex: props.blockIndex,
+      weekIndex: props.weekIndex,
+      dayIndex: props.dayIndex
+    }
+    dispatch(setDailyExercises(payload))
+  }
 
   const addNewExercise = (): void => {
     const payload: AddExercisePayload = {
       exercise: {
+        Id: uuidv4(),
         Name: newExerciseName,
         Multiplier: newMultiplier,
         Sets: newSets,
@@ -43,6 +63,18 @@ export default function ExercisesView (props: any): ReactElement {
       weekIndex: props.weekIndex,
       dayIndex: props.dayIndex
     }
+    const newExercise: Exercise = {
+      Id: payload.exercise.Id,
+      Name: payload.exercise.Name,
+      Multiplier: payload.exercise.Multiplier,
+      Sets: payload.exercise.Sets,
+      Reps: payload.exercise.Reps,
+      Type: payload.exercise.Type,
+      MaxReference: newMaxReference
+    }
+    const newScheduleExercises = [...scheduledExercises]
+    newScheduleExercises.push(newExercise)
+    setScheduledExercises(newScheduleExercises)
     dispatch(addExercise(payload))
     onClose()
   }
@@ -50,36 +82,37 @@ export default function ExercisesView (props: any): ReactElement {
   return (
         <Box>
             <AccordionItem key={props.index}>
-                <TableContainer>
-                    <Table variant="simple">
-                        <Thead>
-                            <Tr>
-                                <Th>Name</Th>
-                                <Th>Sets</Th>
-                                <Th>Reps</Th>
-                                <Th>Multiplier</Th>
-                                <Th>Type</Th>
-                                <Th>Max Reference</Th>
-                                <Th></Th>
-                            </Tr>
-                        </Thead>
-                        <Tbody>
-                            {props.exercises.map((exercise: any, index: number) => {
-                              return (
-                                    <ExerciseView
-                                    key={index}
-                                    exercise={exercise}
-                                    index={index}
-                                    scheduleIndex={props.scheduleIndex}
-                                    workoutIndex={props.workoutIndex}
-                                    blockIndex={props.blockIndex}
-                                    weekIndex={props.weekIndex}
-                                    dayIndex={props.dayIndex}/>
-                              )
-                            })}
-                        </Tbody>
-                    </Table>
-                </TableContainer>
+                <Reorder.Group
+                axis="y"
+                values={scheduledExercises}
+                onReorder={setNewExerciseOrder}>
+                    <VStack
+                    w='100%'
+                    m='5px'
+                    p='5px'>
+                        {scheduledExercises.map((exercise: any, index: number) => {
+                          return (
+                            <Reorder.Item
+                            key={exercise.Id}
+                            value={exercise}
+                            style={{
+                              width: '100%',
+                              listStyleType: 'none'
+                            }}>
+                                <ExerciseView
+                                key={index}
+                                exercise={exercise}
+                                index={index}
+                                scheduleIndex={props.scheduleIndex}
+                                workoutIndex={props.workoutIndex}
+                                blockIndex={props.blockIndex}
+                                weekIndex={props.weekIndex}
+                                dayIndex={props.dayIndex}/>
+                            </Reorder.Item>
+                          )
+                        })}
+                    </VStack>
+                </Reorder.Group>
                 <Button onClick={onOpen}>Add New Exercise</Button>
             </AccordionItem>
             <Modal isOpen={isOpen} onClose={onClose}>

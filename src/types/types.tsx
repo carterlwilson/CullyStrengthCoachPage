@@ -15,6 +15,7 @@ export type Day = {
 }
 
 export type Exercise = {
+    Id: string,
     Name: string,
     Multiplier: number,
     Sets: number,
