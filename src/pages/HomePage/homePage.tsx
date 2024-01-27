@@ -16,10 +16,12 @@ function HomePage (): ReactElement {
               minH="100vh"
               bg={useColorModeValue('gray.100', 'gray.900')}
               w="15%"
-              id='sidebar_box'>
+              id='sidebar_box'
+              position='fixed'
+              zIndex={1}>
               <MenuBar isAdmin={true}/>
             </Box>
-            <Box w="100%" id='content-container'>
+            <Box w="100%" id='content-container' ml='15%' zIndex={0}>
               <Outlet />
             </Box>
           </Flex>

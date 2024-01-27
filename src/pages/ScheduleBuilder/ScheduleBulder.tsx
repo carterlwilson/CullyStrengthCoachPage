@@ -71,7 +71,7 @@ export default function ScheduleBuilder (): ReactElement {
 
   return (
         <Box>
-            <HStack mt={5} ml={5}>
+            <HStack mt={5} ml={5} wrap='wrap'>
                 {existingWorkouts.map((workout, index) => {
                   return (
                         <Button
