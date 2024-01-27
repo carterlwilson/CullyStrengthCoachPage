@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import { updateExercise, deleteExercise } from '../../features/workoutScheduleSlice'
 import { type DeleteExercisePayload, type UpdateExercisePayload } from '../../types/PayloadTypes'
 import { motion } from 'framer-motion'
+import { type Exercise } from '../../types/types'
 
 export function ExerciseView (props: any): ReactElement {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -28,6 +29,16 @@ export function ExerciseView (props: any): ReactElement {
       reps: editedReps
     }
     dispatch(updateExercise(payload))
+    const updatedExercise: Exercise = {
+      Id: props.exercise.Id,
+      Name: payload.name,
+      Multiplier: payload.multiplier,
+      Sets: payload.sets,
+      Reps: payload.reps,
+      Type: props.exercise.Type,
+      MaxReference: props.exercise.MaxReference
+    }
+    props.replaceExercise(payload.exerciseIndex, updatedExercise)
     onClose()
   }
 
@@ -51,6 +62,7 @@ export function ExerciseView (props: any): ReactElement {
     w='full'
     p='5px'
     as={motion.div}
+    whileHover={{ cursor: 'pointer' }}
     >
         <HStack
         justify='space-between'

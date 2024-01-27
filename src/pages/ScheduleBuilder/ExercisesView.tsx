@@ -47,6 +47,12 @@ export default function ExercisesView (props: any): ReactElement {
     dispatch(setDailyExercises(payload))
   }
 
+  const replaceExercise = (index: number, newExercise: Exercise): void => {
+    const newScheduleExercises = [...scheduledExercises]
+    newScheduleExercises[index] = newExercise
+    setScheduledExercises(newScheduleExercises)
+  }
+
   const addNewExercise = (): void => {
     const payload: AddExercisePayload = {
       exercise: {
@@ -107,7 +113,8 @@ export default function ExercisesView (props: any): ReactElement {
                                 workoutIndex={props.workoutIndex}
                                 blockIndex={props.blockIndex}
                                 weekIndex={props.weekIndex}
-                                dayIndex={props.dayIndex}/>
+                                dayIndex={props.dayIndex}
+                                replaceExercise={replaceExercise}/>
                             </Reorder.Item>
                           )
                         })}
