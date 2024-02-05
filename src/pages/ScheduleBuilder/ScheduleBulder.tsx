@@ -17,7 +17,6 @@ export default function ScheduleBuilder (): ReactElement {
   const [showExistingWorkoutToggle, setShowExistingWorkoutToggle] = useState(false)
   const [currentlyShownWorkoutIndex, setCurrentlyShownWorkoutIndex] = useState(-1)
   const [newScheduleName, setNewScheduleName] = useState('')
-  const [currentlyShownSchedule, setCurrentlyShownSchedule] = useState<WorkoutSchedule>()
 
   const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector
   const dispatch = useDispatch()
@@ -39,7 +38,6 @@ export default function ScheduleBuilder (): ReactElement {
 
   const selectExistingWorkout = (index: number): void => {
     setCurrentlyShownWorkoutIndex(index)
-    setCurrentlyShownSchedule(existingWorkouts[index])
     setShowExistingWorkoutToggle(true)
   }
 
@@ -96,7 +94,7 @@ export default function ScheduleBuilder (): ReactElement {
             {showExistingWorkoutToggle &&
                 existingWorkouts[currentlyShownWorkoutIndex] != null &&
                 <ScheduleView
-                workout={currentlyShownSchedule}
+                workout={existingWorkouts[currentlyShownWorkoutIndex]}
                 scheduleIndex={currentlyShownWorkoutIndex}
                 resetIndex={resetCurrentScheduleIndex}/>
             }

@@ -13,9 +13,6 @@ export default function ScheduleView (props: any): ReactElement {
   const copyScheduleModal = useDisclosure()
 
   const dispatch = useDispatch()
-
-  const [editedBlockNumber, setEditedBlockNumber] = useState(0)
-  const [editedWeekNumber, setEditedWeekNumber] = useState(0)
   const [newScheduleName, setNewScheduleName] = useState('')
 
   const addNewBlock = (): void => {
@@ -55,11 +52,20 @@ export default function ScheduleView (props: any): ReactElement {
     dispatch(deleteSchedule(payload))
   }
 
-  const _editIterations = (): void => {
+  const editBlock = (value: number): void => {
     const payload: EditIterationsPayload = {
       scheduleIndex: props.scheduleIndex,
-      block: editedBlockNumber,
-      week: editedWeekNumber
+      block: value,
+      week: props.workout.CurrentWeek
+    }
+    dispatch(editIterations(payload))
+  }
+
+  const editWeek = (value: number): void => {
+    const payload: EditIterationsPayload = {
+      scheduleIndex: props.scheduleIndex,
+      block: props.workout.CurrentBlock,
+      week: value
     }
     dispatch(editIterations(payload))
   }
@@ -94,11 +100,11 @@ export default function ScheduleView (props: any): ReactElement {
                         <Box>
                             <FormLabel>Current Block</FormLabel>
                             <NumberInput
-                            defaultValue={props.workout.CurrentBlock + 1}
+                            value={props.workout.CurrentBlock + 1}
                             min={1}
                             max={props.workout.Blocks.length}
                             w='75px'
-                            onChange={(value) => { setEditedBlockNumber(Number(value) - 1) }}>
+                            onChange={(value) => { editBlock(Number(value) - 1) }}>
                                 <NumberInputField />
                                 <NumberInputStepper>
                                     <NumberIncrementStepper />
@@ -109,11 +115,11 @@ export default function ScheduleView (props: any): ReactElement {
                         <Box>
                             <FormLabel>Current Week</FormLabel>
                             <NumberInput
-                            defaultValue={props.workout.CurrentWeek + 1}
+                            value={props.workout.CurrentWeek + 1}
                             min={1}
-                            max={getWeeksMax(editedBlockNumber)}
+                            max={getWeeksMax(props.workout.CurrentBlock as number)}
                             w='75px'
-                            onChange={(value) => { setEditedWeekNumber(Number(value) - 1) }}>
+                            onChange={(value) => { editWeek(Number(value) - 1) }}>
                                 <NumberInputField />
                                 <NumberInputStepper>
                                     <NumberIncrementStepper />
@@ -122,9 +128,6 @@ export default function ScheduleView (props: any): ReactElement {
                             </NumberInput>
                         </Box>
                     </HStack>
-                    <Button colorScheme='green' onClick={_editIterations} mt={3} mb={3}>
-                        Submit Iteration Changes
-                    </Button>
                 </FormControl>
                 <Accordion allowMultiple>
                     {props.workout.Blocks.map((block: any, index: number) => {
