@@ -8,6 +8,7 @@ import EditFirstNameModal from './EditFirstNameModal'
 import EditLastNameModal from './EditLastNameModal'
 import EditScheduleModal from './EditScheduleModal'
 import EditEmailModal from './EditEmailModal'
+import { motion } from 'framer-motion'
 
 function ClientPage (): ReactElement {
   const initialClient: Client = {
@@ -298,13 +299,14 @@ function ClientPage (): ReactElement {
   }, [])
 
   return (
-        <Flex direction="column" mt={5}>
+        <Flex direction="column" m={5}>
             <Box mb={10}>
-              <Box>
+              <Box mb={5}>
                 <Text>The button below will let you upload a csv file to add clients.</Text>
                 <Text>WARNING: You probably do not want to use this. Text me (Carter) first so I can prep for it.</Text>
               </Box>
               <Input
+                mb={5}
                 name='Clients File'
                 type='file'
                 onChange={(e => { handleClientsFileInput(e) })}/>
@@ -314,7 +316,9 @@ function ClientPage (): ReactElement {
                 w="100px"
                 ml="25px"
                 onClick={onOpen}>Add Client</Button>
-            <TableContainer>
+            <TableContainer
+              as={motion.div}
+              transition={{ ease: 'ease-in-out' }}>
                 <Table variant="simple">
                     <Thead>
                         <Tr>
