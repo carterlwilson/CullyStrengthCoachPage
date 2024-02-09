@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../app/Store'
 import DataPersistence from '../services/DataPersistence'
-import { type ChangeMultiplierPayload, type UpdateExercisePayload, type SetSchedulePayload, type AddExercisePayload, type DeleteExercisePayload, type AddWeekPayload, type DeleteWeekPayload, type AddBlockPayload, type DeleteBlockPayload, type DeleteSchedulePayload, type EditIterationsPayload, type SetDailyExercisesPayload } from '../types/PayloadTypes'
-import { type WorkoutScheduleState, type WorkoutSchedule, type Day } from '../types/types'
+import { type ChangeMultiplierPayload, type UpdateExercisePayload, type SetSchedulePayload, type AddExercisePayload, type DeleteExercisePayload, type AddWeekPayload, type DeleteWeekPayload, type AddBlockPayload, type DeleteBlockPayload, type DeleteSchedulePayload, type EditIterationsPayload, type SetDailyExercisesPayload, type CopyExercisePayload } from '../types/PayloadTypes'
+import { type WorkoutScheduleState, type WorkoutSchedule, type Day, type Exercise } from '../types/types'
 
 // Define the initial state using that type
 const initialState: WorkoutScheduleState = {
@@ -94,6 +94,23 @@ export const workoutScheduleSlice = createSlice({
         .Exercises.splice(action.payload.exerciseIndex, 1)
       dataPersistence.updateSchedules(state).catch(() => {})
     },
+    copyExercise: (state, action: PayloadAction<CopyExercisePayload>) => {
+      const newExercise: Exercise = {
+        ...state
+          .Schedules[action.payload.scheduleIndex]
+          .Blocks[action.payload.blockIndex]
+          .Weeks[action.payload.weekIndex]
+          .Days[action.payload.dayIndex]
+          .Exercises[action.payload.exerciseIndex]
+      }
+      state
+        .Schedules[action.payload.scheduleIndex]
+        .Blocks[action.payload.blockIndex]
+        .Weeks[action.payload.weekIndex]
+        .Days[action.payload.dayIndex]
+        .Exercises.splice(action.payload.exerciseIndex, 0, newExercise)
+      dataPersistence.updateSchedules(state).catch(() => {})
+    },
     setDailyExercises: (state, action: PayloadAction<SetDailyExercisesPayload>) => {
       state
         .Schedules[action.payload.scheduleIndex]
@@ -164,7 +181,8 @@ export const {
   deleteBlock,
   deleteSchedule,
   editIterations,
-  setDailyExercises
+  setDailyExercises,
+  copyExercise
 } = workoutScheduleSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type

@@ -2,8 +2,8 @@
 import { Button, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Input, ModalFooter, useDisclosure, Radio, Card, HStack, Select } from '@chakra-ui/react'
 import React, { type ReactElement, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { updateExercise, deleteExercise } from '../../features/workoutScheduleSlice'
-import { type DeleteExercisePayload, type UpdateExercisePayload } from '../../types/PayloadTypes'
+import { updateExercise, deleteExercise, copyExercise } from '../../features/workoutScheduleSlice'
+import { type CopyExercisePayload, type DeleteExercisePayload, type UpdateExercisePayload } from '../../types/PayloadTypes'
 import { motion } from 'framer-motion'
 import { type ExerciseReference, type Exercise } from '../../types/types'
 
@@ -55,6 +55,17 @@ export function ExerciseView (props: any): ReactElement {
     dispatch(deleteExercise(payload))
   }
 
+  const addDuplicateExercise = (): void => {
+    const payload: CopyExercisePayload = {
+      scheduleIndex: props.scheduleIndex,
+      blockIndex: props.blockIndex,
+      weekIndex: props.weekIndex,
+      dayIndex: props.dayIndex,
+      exerciseIndex: props.index
+    }
+    dispatch(copyExercise(payload))
+  }
+
   return (
     <Card
     direction='row'
@@ -88,6 +99,7 @@ export function ExerciseView (props: any): ReactElement {
                 {props.exercise.MaxReference} as max
             </Text>
             <HStack>
+                <Button onClick={addDuplicateExercise} ml={3}>Copy</Button>
                 <Button onClick={onOpen} ml={3}>Edit</Button>
                 <Button onClick={removeExercise} ml={3}>Delete</Button>
             </HStack>

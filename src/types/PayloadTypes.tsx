@@ -56,6 +56,14 @@ export type DeleteExercisePayload = {
     exerciseIndex: number
 }
 
+export type CopyExercisePayload = {
+    scheduleIndex: number,
+    blockIndex: number,
+    weekIndex: number,
+    dayIndex: number,
+    exerciseIndex: number
+}
+
 export type AddWeekPayload = {
     scheduleIndex: number,
     blockIndex: number,
