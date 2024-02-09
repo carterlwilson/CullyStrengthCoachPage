@@ -5,7 +5,7 @@ export default function NotesView (): ReactElement {
   return (
         <Box
         padding='10px'>
-            <Heading size='md'>Update Notes: Feb 9, 2024</Heading>
+            <Heading size='md'>Release Notes: Feb 9, 2024</Heading>
             <Flex
             flexDirection='column'
             justifyContent='start'>
