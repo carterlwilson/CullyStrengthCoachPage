@@ -10,6 +10,7 @@ export default function NotesView (): ReactElement {
             flexDirection='column'
             justifyContent='start'>
                 <Text>Added ability to edit max reference for exercises in schedule builder</Text>
+                <Text>Can now copy exercises in schedule builder</Text>
                 <Text>General UI Improvements</Text>
             </Flex>
         </Box>
