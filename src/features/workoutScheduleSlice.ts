@@ -53,6 +53,13 @@ export const workoutScheduleSlice = createSlice({
         .Days[action.payload.dayIndex]
         .Exercises[action.payload.exerciseIndex].Multiplier = action.payload.multiplier
 
+      state
+        .Schedules[action.payload.scheduleIndex]
+        .Blocks[action.payload.blockIndex]
+        .Weeks[action.payload.weekIndex]
+        .Days[action.payload.dayIndex]
+        .Exercises[action.payload.exerciseIndex].MaxReference = action.payload.maxReference
+
       dataPersistence.updateSchedules(state).catch(() => {})
     },
     setSchedule: (state, action: PayloadAction<SetSchedulePayload>) => {

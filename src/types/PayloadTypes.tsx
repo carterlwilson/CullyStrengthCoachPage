@@ -18,7 +18,8 @@ export type UpdateExercisePayload = {
     blockIndex: number,
     weekIndex: number,
     dayIndex: number,
-    exerciseIndex: number
+    exerciseIndex: number,
+    maxReference: string
 }
 
 export type SetSchedulePayload = {

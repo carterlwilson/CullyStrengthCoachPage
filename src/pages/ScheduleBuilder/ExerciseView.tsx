@@ -1,11 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Button, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Input, ModalFooter, useDisclosure, Radio, Card, HStack } from '@chakra-ui/react'
+import { Button, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Input, ModalFooter, useDisclosure, Radio, Card, HStack, Select } from '@chakra-ui/react'
 import React, { type ReactElement, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { updateExercise, deleteExercise } from '../../features/workoutScheduleSlice'
 import { type DeleteExercisePayload, type UpdateExercisePayload } from '../../types/PayloadTypes'
 import { motion } from 'framer-motion'
-import { type Exercise } from '../../types/types'
+import { type ExerciseReference, type Exercise } from '../../types/types'
 
 export function ExerciseView (props: any): ReactElement {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -15,6 +15,7 @@ export function ExerciseView (props: any): ReactElement {
   const [editedSets, setEditedSets] = useState(props.exercise.Sets)
   const [editedReps, setEditedReps] = useState(props.exercise.Reps)
   const [editedMultiplier, setEditedMultiplier] = useState(props.exercise.Multiplier)
+  const [editedMaxReference, setEditedMaxReference] = useState(props.exercise.MaxReference)
 
   const saveExerciseData = (): void => {
     const payload: UpdateExercisePayload = {
@@ -26,7 +27,8 @@ export function ExerciseView (props: any): ReactElement {
       exerciseIndex: props.index,
       name: editedName,
       sets: editedSets,
-      reps: editedReps
+      reps: editedReps,
+      maxReference: editedMaxReference
     }
     dispatch(updateExercise(payload))
     const updatedExercise: Exercise = {
@@ -102,6 +104,7 @@ export function ExerciseView (props: any): ReactElement {
                         value={editedName}
                         onChange={event => { setEditedName(event.target.value) }}
                         size='sm'
+                        mb='10px'
                     />
                     <Text mb='8px'>Sets:</Text>
                     <Input
@@ -109,6 +112,7 @@ export function ExerciseView (props: any): ReactElement {
                         value={editedSets}
                         onChange={event => { setEditedSets(Number(event.target.value)) }}
                         size='sm'
+                        mb='10px'
                     />
                     <Text mb='8px'>Reps:</Text>
                     <Input
@@ -116,6 +120,7 @@ export function ExerciseView (props: any): ReactElement {
                         value={editedReps}
                         onChange={event => { setEditedReps(Number(event.target.value)) }}
                         size='sm'
+                        mb='10px'
                     />
                     <Text mb='8px'>Multiplier:</Text>
                     <Input
@@ -123,7 +128,15 @@ export function ExerciseView (props: any): ReactElement {
                         value={editedMultiplier}
                         onChange={event => { setEditedMultiplier(Number(event.target.value)) }}
                         size='sm'
+                        mb='10px'
                     />
+                    <Select placeholder='Select max reference' onChange={(event) => { setEditedMaxReference(event.target.value) }}>
+                        {props.exercises.map((ex: ExerciseReference, index: number) => {
+                          return (
+                                <option key={index} value={ex.name}>{ex.name}</option>
+                          )
+                        })}
+                    </Select>
                 </ModalBody>
                 <ModalFooter>
                     <Button onClick={saveExerciseData}>Save</Button>

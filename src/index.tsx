@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage/homePage'
 import ScheduleBuilder from './pages/ScheduleBuilder/ScheduleBulder'
 import { ChakraProvider } from '@chakra-ui/react'
 import MaxesPage from './pages/MaxesPage'
+import NotesView from './pages/NotesView'
 
 const root = ReactDOM.createRoot(
   // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
     path: '/home',
     element: <HomePage />,
     children: [
+      {
+        path: '',
+        element: <NotesView />
+      },
       {
         path: 'clients',
         element: <ClientPage />

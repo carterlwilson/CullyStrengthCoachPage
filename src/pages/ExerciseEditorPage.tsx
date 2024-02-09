@@ -1,5 +1,5 @@
 import React, { type ReactElement, useEffect, useState } from 'react'
-import { Box, Button, Flex, FormControl, FormLabel, Input, useDisclosure, Text, Modal, ModalBody, ModalContent, ModalOverlay, SimpleGrid, Card, CardHeader, Heading, CardBody, IconButton, Spacer, CardFooter, ModalHeader, ModalCloseButton } from '@chakra-ui/react'
+import { Box, Button, Flex, FormControl, FormLabel, Input, useDisclosure, Text, Modal, ModalBody, ModalContent, ModalOverlay, SimpleGrid, Card, CardHeader, Heading, IconButton, Spacer, CardFooter, ModalHeader, ModalCloseButton } from '@chakra-ui/react'
 import DataPersistence from '../services/DataPersistence'
 import { type ExerciseReference, type ExerciseType } from '../types/types'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
@@ -60,9 +60,6 @@ function ExerciseEditorPage (): ReactElement {
                                 </Flex>
                                 <Text>{getType(Number(ex.type))}</Text>
                             </CardHeader>
-                            <CardBody>
-                                <Text>Whatever else we want here</Text>
-                            </CardBody>
                             <CardFooter>
                                 <IconButton aria-label='Delete Exercise' icon={<DeleteIcon />} onClick={() => { deleteExercise(ex.id) }}/>
                                     <Spacer />

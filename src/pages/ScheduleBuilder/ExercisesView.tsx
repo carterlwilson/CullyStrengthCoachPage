@@ -106,15 +106,16 @@ export default function ExercisesView (props: any): ReactElement {
                               listStyleType: 'none'
                             }}>
                                 <ExerciseView
-                                key={index}
-                                exercise={exercise}
-                                index={index}
-                                scheduleIndex={props.scheduleIndex}
-                                workoutIndex={props.workoutIndex}
-                                blockIndex={props.blockIndex}
-                                weekIndex={props.weekIndex}
-                                dayIndex={props.dayIndex}
-                                replaceExercise={replaceExercise}/>
+                                  key={index}
+                                  exercise={exercise}
+                                  index={index}
+                                  scheduleIndex={props.scheduleIndex}
+                                  workoutIndex={props.workoutIndex}
+                                  blockIndex={props.blockIndex}
+                                  weekIndex={props.weekIndex}
+                                  dayIndex={props.dayIndex}
+                                  exercises={exercises}
+                                  replaceExercise={replaceExercise}/>
                             </Reorder.Item>
                           )
                         })}
