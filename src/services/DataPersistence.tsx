@@ -1,6 +1,6 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app'
-import { getFirestore, collection, getDocs, setDoc, addDoc, type DocumentData, doc, deleteDoc, getDoc, type QueryDocumentSnapshot } from 'firebase/firestore'
-import { type Block, type Client, type Day, type Exercise, type ExerciseReference, type ExerciseType, type Iteration, type Max, type Week, type WorkoutSchedule, type WorkoutScheduleState } from '../types/types'
+import { getFirestore, collection, getDocs, setDoc, addDoc, type DocumentData, doc, deleteDoc, getDoc, type QueryDocumentSnapshot, FirestoreError } from 'firebase/firestore'
+import { type Block, type Client, type Day, type Exercise, type ExerciseReference, type ExerciseType, type Iteration, type Max, type Week, type WorkoutSchedule, type WorkoutScheduleState, type UserMetadata } from '../types/types'
 import { v4 as uuidv4 } from 'uuid'
 
 export default class DataPersistence {
@@ -102,11 +102,18 @@ export default class DataPersistence {
     return block
   }
 
-  async getUserRole (username: string): Promise<number> {
+  async getUserMetadata (username: string): Promise<UserMetadata> {
     const db = getFirestore(this.firebaseApp)
-    const docRef = doc(db, 'Roles', username)
-    const role = await getDoc(docRef)
-    return role.data()?.Role
+    const docRef = doc(db, 'UserMetadata', username)
+    const data = (await (getDoc(docRef))).data()
+    if (data != null) {
+      const metadata: UserMetadata = {
+        Role: data.Role,
+        Username: data.Username,
+        Id: data.Id
+      }
+      return metadata
+    } else throw FirestoreError
   }
 
   async getSchedules (): Promise<WorkoutSchedule[]> {
@@ -164,6 +171,17 @@ export default class DataPersistence {
     const db = getFirestore(this.firebaseApp)
     const clientsCollection = collection(db, 'ClientsV2')
     return await addDoc(clientsCollection, newClient)
+  }
+
+  async addMetadata (metadata: Client): Promise<void> {
+    const db = getFirestore(this.firebaseApp)
+    const newMetadata: UserMetadata = {
+      Role: 0,
+      Username: metadata.email,
+      Id: metadata.id
+    }
+    const docRef = doc(db, `UserMetadata/${metadata.email}`)
+    await setDoc(docRef, newMetadata)
   }
 
   async updateClient (client: Client): Promise<void> {

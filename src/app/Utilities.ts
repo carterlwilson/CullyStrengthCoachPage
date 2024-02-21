@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-extraneous-class */
-import DataPersistence from '../services/DataPersistence'
+import { type UserMetadata } from '../types/types'
 
 class Utilities {
-  static IsAdminUser = async (username: string): Promise<boolean> => {
-    const dataPersistence = new DataPersistence()
-    const role = await dataPersistence.getUserRole(username)
-    if (role === 1) return true
+  static IsAdminUser = async (userMetadata: UserMetadata): Promise<boolean> => {
+    if (userMetadata.Role === 1) return true
     else return false
   }
 }

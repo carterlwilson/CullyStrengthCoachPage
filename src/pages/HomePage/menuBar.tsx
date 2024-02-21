@@ -4,18 +4,24 @@ import { Link, useNavigate } from 'react-router-dom'
 import { auth } from '../../auth'
 import { signOut } from 'firebase/auth'
 import Utilities from '../../app/Utilities'
+import DataPersistence from '../../services/DataPersistence'
 
 export default function MenuBar (props: any): ReactElement {
   const navigate = useNavigate()
   const [isAdmin, setIsAdmin] = useState(false)
 
+  const dataPersistence = new DataPersistence()
+
   useEffect(() => {
     const username = window.localStorage.getItem('username')
     if (username != null) {
-      Utilities.IsAdminUser(username).then((response) => {
-        if (response) {
-          setIsAdmin(response)
-        }
+      dataPersistence.getUserMetadata(username).then((metadata) => {
+        window.localStorage.setItem('userId', metadata.Id)
+        Utilities.IsAdminUser(metadata).then((response) => {
+          if (response) {
+            setIsAdmin(response)
+          }
+        }).catch((error) => { console.log(error) })
       }).catch((error) => { console.log(error) })
     }
   }, [])

@@ -9,6 +9,8 @@ import EditLastNameModal from './EditLastNameModal'
 import EditScheduleModal from './EditScheduleModal'
 import EditEmailModal from './EditEmailModal'
 import { motion } from 'framer-motion'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../../auth'
 
 function ClientPage (): ReactElement {
   const initialClient: Client = {
@@ -42,6 +44,21 @@ function ClientPage (): ReactElement {
   const editScheduleDialog = useDisclosure()
   const cancelRef = React.useRef() as any
   const toast = useToast()
+
+  const setRolesAndIds = (): void => {
+    dataPersistence.getClients().then((clients) => {
+      clients.forEach(c => {
+        dataPersistence.addMetadata(c).catch(() => {})
+      })
+    }).catch(() => {})
+  }
+
+  const addLogins = (): void => {
+    clientList.forEach((client) => {
+      const id = uuidv4()
+      createUserWithEmailAndPassword(auth, client.email, id).catch(() => {})
+    })
+  }
 
   const addClient = (): void => {
     const id = uuidv4()
@@ -310,7 +327,9 @@ function ClientPage (): ReactElement {
                 name='Clients File'
                 type='file'
                 onChange={(e => { handleClientsFileInput(e) })}/>
-              <Button onClick={onSubmitClientsFile}>Submit</Button>
+              <Button onClick={onSubmitClientsFile} mr={5}>Submit</Button>
+              <Button onClick={setRolesAndIds} mr={5}>Set Roles</Button>
+              <Button onClick={addLogins} mr={4}>Create Logins</Button>
             </Box>
             <Button
                 w="100px"
