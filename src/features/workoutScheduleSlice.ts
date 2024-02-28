@@ -3,6 +3,7 @@ import type { RootState } from '../app/Store'
 import DataPersistence from '../services/DataPersistence'
 import { type ChangeMultiplierPayload, type UpdateExercisePayload, type SetSchedulePayload, type AddExercisePayload, type DeleteExercisePayload, type AddWeekPayload, type DeleteWeekPayload, type AddBlockPayload, type DeleteBlockPayload, type DeleteSchedulePayload, type EditIterationsPayload, type SetDailyExercisesPayload, type CopyExercisePayload } from '../types/PayloadTypes'
 import { type WorkoutScheduleState, type WorkoutSchedule, type Day, type Exercise } from '../types/types'
+import { v4 as uuidv4 } from 'uuid'
 
 // Define the initial state using that type
 const initialState: WorkoutScheduleState = {
@@ -74,6 +75,18 @@ export const workoutScheduleSlice = createSlice({
       dataPersistence.deleteSchedule(action.payload.id).catch(() => {})
     },
     setInitialSchedules: (state, action: PayloadAction<WorkoutSchedule[]>) => {
+      const schedules = action.payload
+      schedules.forEach(schedule => {
+        schedule.Blocks.forEach(block => {
+          block.Weeks.forEach(week => {
+            week.Days.forEach(day => {
+              day.Exercises.forEach(exercise => {
+                exercise.Id = uuidv4()
+              })
+            })
+          })
+        })
+      })
       state.Schedules = action.payload
     },
     addExercise: (state, action: PayloadAction<AddExercisePayload>) => {
@@ -103,6 +116,7 @@ export const workoutScheduleSlice = createSlice({
           .Days[action.payload.dayIndex]
           .Exercises[action.payload.exerciseIndex]
       }
+      newExercise.Id = uuidv4()
       state
         .Schedules[action.payload.scheduleIndex]
         .Blocks[action.payload.blockIndex]
