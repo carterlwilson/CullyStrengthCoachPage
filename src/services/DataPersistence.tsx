@@ -116,6 +116,17 @@ export default class DataPersistence {
     } else throw FirestoreError
   }
 
+  async getClient (id: string): Promise<Client> {
+    const db = getFirestore(this.firebaseApp)
+    const docRef = doc(db, 'ClientsV2', id)
+    const docResponse = await (getDoc(docRef))
+    const data = docResponse.data()
+    if (data != null) {
+      const client: Client = this.buildClientFromApiResponse(data, docResponse.id)
+      return client
+    } else throw FirestoreError
+  }
+
   async getSchedules (): Promise<WorkoutSchedule[]> {
     const db = getFirestore(this.firebaseApp)
     const schedulesCollection = collection(db, 'Schedules')

@@ -5,6 +5,7 @@ import { auth } from '../../auth'
 import { signOut } from 'firebase/auth'
 import Utilities from '../../app/Utilities'
 import DataPersistence from '../../services/DataPersistence'
+import { type UserMetadata } from '../../types/types'
 
 export default function MenuBar (props: any): ReactElement {
   const navigate = useNavigate()
@@ -15,7 +16,7 @@ export default function MenuBar (props: any): ReactElement {
   useEffect(() => {
     const username = window.localStorage.getItem('username')
     if (username != null) {
-      dataPersistence.getUserMetadata(username).then((metadata) => {
+      dataPersistence.getUserMetadata(username).then((metadata: UserMetadata) => {
         window.localStorage.setItem('userId', metadata.Id)
         Utilities.IsAdminUser(metadata).then((response) => {
           if (response) {

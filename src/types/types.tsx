@@ -1,8 +1,8 @@
-export interface WorkoutScheduleState {
+export type WorkoutScheduleState = {
   Schedules: WorkoutSchedule[]
 }
 
-export interface WorkoutSchedule {
+export type WorkoutSchedule = {
   Id: string
   Name: string
   Blocks: Block[]
@@ -10,11 +10,11 @@ export interface WorkoutSchedule {
   CurrentWeek: number
 }
 
-export interface Day {
+export type Day = {
   Exercises: Exercise[]
 }
 
-export interface Exercise {
+export type Exercise = {
   Id: string
   Name: string
   Multiplier: number
@@ -24,15 +24,15 @@ export interface Exercise {
   MaxReference: string
 }
 
-export interface Week {
+export type Week = {
   Days: Day[]
 }
 
-export interface Block {
+export type Block = {
   Weeks: Week[]
 }
 
-export interface Client {
+export type Client = {
   id: string
   firstName: string
   lastName: string
@@ -41,27 +41,27 @@ export interface Client {
   scheduleId: string
 }
 
-export interface Max {
+export type Max = {
   name: string
   weight: number
 }
 
-export interface ExerciseReference {
+export type ExerciseReference = {
   name: string
   type: number
   id: string
 }
 
-export interface ExerciseType {
+export type ExerciseType = {
   Name: string
 }
 
-export interface Iteration {
+export type Iteration = {
   Block: number
   Week: number
 }
 
-export interface UserMetadata {
+export type UserMetadata = {
   Role: number
   Username: string
   Id: string
