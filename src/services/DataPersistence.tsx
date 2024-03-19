@@ -17,9 +17,7 @@ export default class DataPersistence {
   firebaseApp: FirebaseApp
 
   constructor () {
-    console.log('initializing firebase')
     this.firebaseApp = initializeApp(this.firebaseConfig)
-    console.log('finished initializing')
   }
 
   buildClientFromApiResponse (data: DocumentData, id: string): Client {
@@ -104,7 +102,7 @@ export default class DataPersistence {
 
   async getUserMetadata (username: string): Promise<UserMetadata> {
     const db = getFirestore(this.firebaseApp)
-    const docRef = doc(db, 'UserMetadata', username)
+    const docRef = doc(db, 'UserMetadataV2', username.toLowerCase())
     const data = (await (getDoc(docRef))).data()
     if (data != null) {
       const metadata: UserMetadata = {
@@ -178,20 +176,20 @@ export default class DataPersistence {
     return clientsList
   }
 
-  async addNewClient (newClient: Client): Promise<DocumentData> {
+  async addNewClient (newClient: Client): Promise<void> {
     const db = getFirestore(this.firebaseApp)
-    const clientsCollection = collection(db, 'ClientsV2')
-    return await addDoc(clientsCollection, newClient)
+    const docRef = doc(db, `ClientsV2/${newClient.id}`)
+    await setDoc(docRef, newClient)
   }
 
   async addMetadata (metadata: Client): Promise<void> {
     const db = getFirestore(this.firebaseApp)
     const newMetadata: UserMetadata = {
       Role: 0,
-      Username: metadata.email,
+      Username: metadata.email.toLowerCase(),
       Id: metadata.id
     }
-    const docRef = doc(db, `UserMetadata/${metadata.email}`)
+    const docRef = doc(db, `UserMetadataV2/${metadata.email.toLowerCase()}`)
     await setDoc(docRef, newMetadata)
   }
 

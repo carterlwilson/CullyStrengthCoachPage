@@ -45,34 +45,21 @@ function ClientPage (): ReactElement {
   const cancelRef = React.useRef() as any
   const toast = useToast()
 
-  const setRolesAndIds = (): void => {
-    dataPersistence.getClients().then((clients) => {
-      clients.forEach(c => {
-        dataPersistence.addMetadata(c).catch(() => {})
-      })
-    }).catch(() => {})
-  }
-
-  const addLogins = (): void => {
-    clientList.forEach((client) => {
-      const id = uuidv4()
-      createUserWithEmailAndPassword(auth, client.email, id).catch(() => {})
-    })
-  }
-
   const addClient = (): void => {
     const id = uuidv4()
     const newMaxes: Max[] = []
     const newClient: Client = {
       firstName: newFirstName,
       lastName: newLastName,
-      email: newEmail,
+      email: newEmail.toLowerCase(),
       maxes: newMaxes,
       id,
       scheduleId: newScheduleId
     }
     dataPersistence.addNewClient(newClient)
       .then(success => {
+        createUserWithEmailAndPassword(auth, newClient.email.toLowerCase(), newClient.id).catch(() => {})
+        dataPersistence.addMetadata(newClient).catch(() => {})
         setClientList(clientList.concat(newClient))
         toast({
           description: 'Client Added successfully',
@@ -328,8 +315,6 @@ function ClientPage (): ReactElement {
                 type='file'
                 onChange={(e => { handleClientsFileInput(e) })}/>
               <Button onClick={onSubmitClientsFile} mr={5}>Submit</Button>
-              <Button onClick={setRolesAndIds} mr={5}>Set Roles</Button>
-              <Button onClick={addLogins} mr={4}>Create Logins</Button>
             </Box>
             <Button
                 w="100px"

@@ -1,5 +1,5 @@
 import React, { useEffect, type ReactElement, useState } from 'react'
-import { Flex, Box, Card, CardBody, FormControl, FormLabel, NumberInput, NumberInputField, CardFooter, Button, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, Select, HStack, useToast, IconButton } from '@chakra-ui/react'
+import { Flex, Box, Card, CardBody, FormControl, FormLabel, NumberInput, NumberInputField, Button, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, Select, HStack, useToast, IconButton, CardHeader, Heading, Text, Stack, StackDivider } from '@chakra-ui/react'
 import DataPersistence from '../services/DataPersistence'
 import { type Client, type ExerciseReference, type Max } from '../types/types'
 import { DeleteIcon } from '@chakra-ui/icons'
@@ -29,8 +29,6 @@ export default function MaxesPage (): ReactElement {
   }, [])
 
   const addNewMax = (): void => {
-    console.log(newMaxName)
-    console.log(newMaxWeight)
     addNewMaxModal.onClose()
     const newMax: Max = {
       name: newMaxName,
@@ -89,37 +87,41 @@ export default function MaxesPage (): ReactElement {
 
   return (
       <Flex justifyContent='center'>
-        <Card w="75%" mt={20}>
+        <Card w={['60%', '75%']} mt={20}>
+          <CardHeader>
+            <Heading>Welcome {client?.firstName}!</Heading>
+            <Text>You can set your maxes here. Nothing will be changed until you click the submit button.</Text>
+          </CardHeader>
           <CardBody>
-            <FormControl>
-              { maxes.map((max: Max, index: number) => {
-                return (
-                  <Box key={index} mb={10}>
-                    <HStack>
-                      <FormLabel>{max.name}</FormLabel>
-                      <IconButton
-                      onClick={() => { deleteMax(index) }}
-                      aria-label='Search database'
-                      icon={<DeleteIcon />} />
-                    </HStack>
-                    <FormLabel>Current Max: {max.weight}</FormLabel>
-                    <HStack>
-                      <FormLabel>New Max: </FormLabel>
-                      <NumberInput>
-                        <NumberInputField onChange={(event) => { editMaxWeight(index, max.name, Number(event.target.value)) }}/>
-                      </NumberInput>
-                    </HStack>
-                  </Box>
-                )
-              })}
-            </FormControl>
+            <Stack divider={<StackDivider />} spacing='4'>
+              <Box>
+                <Button onClick={addNewMaxModal.onOpen} mr={5} mb={5}>Add New Max</Button>
+                <Button onClick={submitChanges} mb={5}>Submit Changes</Button>
+              </Box>
+              <FormControl>
+                { maxes.map((max: Max, index: number) => {
+                  return (
+                    <Box key={index} mb={10}>
+                      <HStack>
+                        <FormLabel>{max.name}</FormLabel>
+                        <IconButton
+                        onClick={() => { deleteMax(index) }}
+                        aria-label='Search database'
+                        icon={<DeleteIcon />} />
+                      </HStack>
+                      <FormLabel>Current Max: {max.weight}</FormLabel>
+                      <HStack>
+                        <FormLabel>New Max: </FormLabel>
+                        <NumberInput>
+                          <NumberInputField onChange={(event) => { editMaxWeight(index, max.name, Number(event.target.value)) }}/>
+                        </NumberInput>
+                      </HStack>
+                    </Box>
+                  )
+                })}
+              </FormControl>
+            </Stack>
           </CardBody>
-          <CardFooter>
-            <Box>
-              <Button onClick={addNewMaxModal.onOpen} mb={5} mr={5}>Add New Max</Button>
-              <Button onClick={submitChanges}>Submit Changes</Button>
-            </Box>
-          </CardFooter>
         </Card>
         <Modal isOpen={addNewMaxModal.isOpen} onClose={addNewMaxModal.onClose}>
           <ModalOverlay />

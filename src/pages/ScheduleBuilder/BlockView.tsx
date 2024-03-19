@@ -27,7 +27,6 @@ export default function BlockView (props: any): ReactElement {
       blockIndex: props.blockIndex,
       week: newWeek
     }
-    console.log(props.blockIndex)
     dispatch(addWeek(addWeekPayload))
   }
 
