@@ -5,23 +5,18 @@ import { signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail 
 import { auth } from '../auth'
 import { useNavigate } from 'react-router-dom'
 import DataPersistence from '../services/DataPersistence'
-import { type WorkoutSchedule } from '../types/types'
+import { type UserMetadata, type WorkoutSchedule } from '../types/types'
 
 export default function LoginPage (): ReactElement {
   const [email, setEmail] = useState('')
   const [passwordChangeEmail, setPasswordChangeEmail] = useState('')
   const [password, setPassword] = useState('')
-  /*   const [newEmail, setNewEmail] = useState('')
-  const [newPassword1, setNewPassword1] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('') */
   const [scheduleList, setScheduleList] = useState<WorkoutSchedule[]>([])
   const navigate = useNavigate()
   const dataPersistence = new DataPersistence()
   const toast = useToast()
 
   useEffect(() => {
-    console.log('starting page')
     dataPersistence.getSchedules()
       .then(response => {
         setScheduleList(scheduleList)
@@ -30,10 +25,13 @@ export default function LoginPage (): ReactElement {
   }, [])
 
   onAuthStateChanged(auth, (user) => {
-    console.log('auth state changed')
     if (user?.email != null) {
-      window.localStorage.setItem('username', user.email)
-      navigate('/home')
+      window.localStorage.setItem('username', user.email.toLowerCase())
+      dataPersistence.getUserMetadata(user.email).then((metadata: UserMetadata) => {
+        window.localStorage.setItem('userId', metadata.Id)
+        window.localStorage.setItem('userRole', metadata.Role.toString())
+        navigate('/home')
+      }).catch((error) => { console.log(error) })
     } else {
       // User is signed out
       // ...
@@ -41,7 +39,6 @@ export default function LoginPage (): ReactElement {
   })
 
   const login = (): void => {
-    console.log('logging in')
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
@@ -58,33 +55,6 @@ export default function LoginPage (): ReactElement {
         })
       })
   }
-  /*
-  const getDefaultId = (): string => {
-    const id = (scheduleList.find(s => s.Name.toLowerCase() === 'default')?.Id)
-    if (id != null) {
-      return id
-    } else return '0'
-  } */
-
-  /*   const createNewUser = (): void => {
-    createUserWithEmailAndPassword(auth, newEmail, newPassword1).then((result) => {
-      const id = uuidv4()
-      const newMaxes: Max[] = []
-      const newClient: Client = {
-        firstName,
-        lastName,
-        email: newEmail,
-        maxes: newMaxes,
-        id,
-        scheduleId: getDefaultId()
-      }
-      dataPersistence.addNewClient(newClient)
-        .then((result) => {})
-        .catch((error) => { console.log(error) })
-    }).catch((error) => {
-      console.log(error)
-    })
-  } */
 
   const _sendPasswordResetEmail = (): void => {
     sendPasswordResetEmail(auth, passwordChangeEmail)
@@ -101,11 +71,11 @@ export default function LoginPage (): ReactElement {
 
   return (
     <Flex p='10' alignItems='center' justifyContent='center'>
-        <Card w='50%'>
+        <Card w={['90%', '60%']}>
             <CardBody>
                 <Stack divider={<StackDivider />} spacing='4'>
                     <Box mb={10}>
-                        <Heading size='md'>Welcome! Please log in</Heading>
+                        <Heading size='md'>Welcome to Cully Strength! Please log in</Heading>
                         <FormControl isRequired>
                             <FormLabel>Email Address</FormLabel>
                             <Input type='email' onChange={(x => { setEmail(x.target.value) })}/>

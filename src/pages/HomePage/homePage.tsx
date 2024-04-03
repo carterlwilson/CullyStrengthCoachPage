@@ -15,7 +15,7 @@ function HomePage (): ReactElement {
             <Box
               minH="100vh"
               bg={useColorModeValue('gray.100', 'gray.900')}
-              w="15%"
+              w={['30%', '15%']}
               id='sidebar_box'
               position='fixed'
               zIndex={1}

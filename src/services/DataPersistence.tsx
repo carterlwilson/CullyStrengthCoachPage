@@ -1,6 +1,6 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app'
-import { getFirestore, collection, getDocs, setDoc, addDoc, type DocumentData, doc, deleteDoc, getDoc, type QueryDocumentSnapshot } from 'firebase/firestore'
-import { type Block, type Client, type Day, type Exercise, type ExerciseReference, type ExerciseType, type Iteration, type Max, type Week, type WorkoutSchedule, type WorkoutScheduleState } from '../types/types'
+import { getFirestore, collection, getDocs, setDoc, addDoc, type DocumentData, doc, deleteDoc, getDoc, type QueryDocumentSnapshot, FirestoreError } from 'firebase/firestore'
+import { type Block, type Client, type Day, type Exercise, type ExerciseReference, type ExerciseType, type Iteration, type Max, type Week, type WorkoutSchedule, type WorkoutScheduleState, type UserMetadata } from '../types/types'
 import { v4 as uuidv4 } from 'uuid'
 
 export default class DataPersistence {
@@ -17,9 +17,7 @@ export default class DataPersistence {
   firebaseApp: FirebaseApp
 
   constructor () {
-    console.log('initializing firebase')
     this.firebaseApp = initializeApp(this.firebaseConfig)
-    console.log('finished initializing')
   }
 
   buildClientFromApiResponse (data: DocumentData, id: string): Client {
@@ -102,11 +100,29 @@ export default class DataPersistence {
     return block
   }
 
-  async getUserRole (username: string): Promise<number> {
+  async getUserMetadata (username: string): Promise<UserMetadata> {
     const db = getFirestore(this.firebaseApp)
-    const docRef = doc(db, 'Roles', username)
-    const role = await getDoc(docRef)
-    return role.data()?.Role
+    const docRef = doc(db, 'UserMetadataV2', username.toLowerCase())
+    const data = (await (getDoc(docRef))).data()
+    if (data != null) {
+      const metadata: UserMetadata = {
+        Role: data.Role,
+        Username: data.Username,
+        Id: data.Id
+      }
+      return metadata
+    } else throw FirestoreError
+  }
+
+  async getClient (id: string): Promise<Client> {
+    const db = getFirestore(this.firebaseApp)
+    const docRef = doc(db, 'ClientsV2', id)
+    const docResponse = await (getDoc(docRef))
+    const data = docResponse.data()
+    if (data != null) {
+      const client: Client = this.buildClientFromApiResponse(data, docResponse.id)
+      return client
+    } else throw FirestoreError
   }
 
   async getSchedules (): Promise<WorkoutSchedule[]> {
@@ -160,10 +176,21 @@ export default class DataPersistence {
     return clientsList
   }
 
-  async addNewClient (newClient: Client): Promise<DocumentData> {
+  async addNewClient (newClient: Client): Promise<void> {
     const db = getFirestore(this.firebaseApp)
-    const clientsCollection = collection(db, 'ClientsV2')
-    return await addDoc(clientsCollection, newClient)
+    const docRef = doc(db, `ClientsV2/${newClient.id}`)
+    await setDoc(docRef, newClient)
+  }
+
+  async addMetadata (metadata: Client): Promise<void> {
+    const db = getFirestore(this.firebaseApp)
+    const newMetadata: UserMetadata = {
+      Role: 0,
+      Username: metadata.email.toLowerCase(),
+      Id: metadata.id
+    }
+    const docRef = doc(db, `UserMetadataV2/${metadata.email.toLowerCase()}`)
+    await setDoc(docRef, newMetadata)
   }
 
   async updateClient (client: Client): Promise<void> {

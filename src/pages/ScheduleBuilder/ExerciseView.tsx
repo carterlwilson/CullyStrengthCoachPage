@@ -1,11 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Button, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Input, ModalFooter, useDisclosure, Radio, Card, HStack, Select } from '@chakra-ui/react'
+import { Button, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Input, ModalFooter, useDisclosure, Radio, Card, HStack, Select, IconButton } from '@chakra-ui/react'
 import React, { type ReactElement, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { updateExercise, deleteExercise, copyExercise } from '../../features/workoutScheduleSlice'
 import { type CopyExercisePayload, type DeleteExercisePayload, type UpdateExercisePayload } from '../../types/PayloadTypes'
 import { motion } from 'framer-motion'
 import { type ExerciseReference, type Exercise } from '../../types/types'
+import { EditIcon } from '@chakra-ui/icons'
 
 export function ExerciseView (props: any): ReactElement {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -102,6 +103,7 @@ export function ExerciseView (props: any): ReactElement {
                 <Button onClick={addDuplicateExercise} ml={3}>Copy</Button>
                 <Button onClick={onOpen} ml={3}>Edit</Button>
                 <Button onClick={removeExercise} ml={3}>Delete</Button>
+                <IconButton aria-label='Edit exercise' icon={<EditIcon />} />
             </HStack>
         </HStack>
 

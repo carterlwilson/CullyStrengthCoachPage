@@ -11,12 +11,9 @@ export default function MenuBar (props: any): ReactElement {
 
   useEffect(() => {
     const username = window.localStorage.getItem('username')
-    if (username != null) {
-      Utilities.IsAdminUser(username).then((response) => {
-        if (response) {
-          setIsAdmin(response)
-        }
-      }).catch((error) => { console.log(error) })
+    const role = window.localStorage.getItem('userRole')
+    if (username != null && role != null) {
+      setIsAdmin(Utilities.IsAdminUser(Number(role)))
     }
   }, [])
 

@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/no-extraneous-class */
-import DataPersistence from '../services/DataPersistence'
-
 class Utilities {
-  static IsAdminUser = async (username: string): Promise<boolean> => {
-    const dataPersistence = new DataPersistence()
-    const role = await dataPersistence.getUserRole(username)
+  static IsAdminUser = (role: number): boolean => {
     if (role === 1) return true
     else return false
   }

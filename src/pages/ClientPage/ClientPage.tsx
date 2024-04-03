@@ -9,6 +9,8 @@ import EditLastNameModal from './EditLastNameModal'
 import EditScheduleModal from './EditScheduleModal'
 import EditEmailModal from './EditEmailModal'
 import { motion } from 'framer-motion'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../../auth'
 
 function ClientPage (): ReactElement {
   const initialClient: Client = {
@@ -49,13 +51,15 @@ function ClientPage (): ReactElement {
     const newClient: Client = {
       firstName: newFirstName,
       lastName: newLastName,
-      email: newEmail,
+      email: newEmail.toLowerCase(),
       maxes: newMaxes,
       id,
       scheduleId: newScheduleId
     }
     dataPersistence.addNewClient(newClient)
       .then(success => {
+        createUserWithEmailAndPassword(auth, newClient.email.toLowerCase(), newClient.id).catch(() => {})
+        dataPersistence.addMetadata(newClient).catch(() => {})
         setClientList(clientList.concat(newClient))
         toast({
           description: 'Client Added successfully',
@@ -310,7 +314,7 @@ function ClientPage (): ReactElement {
                 name='Clients File'
                 type='file'
                 onChange={(e => { handleClientsFileInput(e) })}/>
-              <Button onClick={onSubmitClientsFile}>Submit</Button>
+              <Button onClick={onSubmitClientsFile} mr={5}>Submit</Button>
             </Box>
             <Button
                 w="100px"
