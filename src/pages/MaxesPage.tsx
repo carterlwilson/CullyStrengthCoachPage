@@ -36,12 +36,14 @@ export default function MaxesPage (): ReactElement {
     }
 
     const tempEditedMaxes = [...editedMaxes]
-    tempEditedMaxes.push(newMax)
+    tempEditedMaxes.unshift(newMax)
     setEditedMaxes(tempEditedMaxes)
 
     const tempShownMaxes = [...maxes]
-    tempShownMaxes.push(newMax)
+    tempShownMaxes.unshift(newMax)
     setMaxes(tempShownMaxes)
+
+    submitChangesOnAdd(tempEditedMaxes)
   }
 
   const editMaxWeight = (index: number, name: string, weight: number): void => {
@@ -58,6 +60,31 @@ export default function MaxesPage (): ReactElement {
     tempMaxes.splice(index, 1)
     setEditedMaxes(tempMaxes)
     setMaxes(tempMaxes)
+  }
+
+  const submitChangesOnAdd = (maxesToSubmit: Max[]): void => {
+    if (client != null) {
+      const editedClient = { ...client }
+      editedClient.maxes = maxesToSubmit
+      dataPersistence.updateClient(editedClient).then(() => {
+        toast({
+          title: 'Maxes Updated.',
+          description: "We've updated your maxes for you.",
+          status: 'success',
+          duration: 9000,
+          isClosable: true
+        })
+        setMaxes(maxesToSubmit)
+      }).catch(() => {
+        toast({
+          title: 'Error Updating.',
+          description: 'We ran into an error updating your maxes, contact your coach.',
+          status: 'error',
+          duration: 9000,
+          isClosable: true
+        })
+      })
+    }
   }
 
   const submitChanges = (): void => {
