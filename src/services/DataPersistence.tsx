@@ -149,7 +149,7 @@ export default class DataPersistence {
       }
       exerciseRefList.push(newRef)
     })
-    return exerciseRefList
+    return exerciseRefList.sort((a, b) => a.name.localeCompare(b.name))
   }
 
   async addNewExercise (exercise: ExerciseType): Promise<void> {
