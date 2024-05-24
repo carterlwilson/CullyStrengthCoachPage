@@ -285,8 +285,6 @@ function ClientPage (): ReactElement {
   useEffect(() => {
     dataPersistence.getClients()
       .then(response => {
-        const griego = response.find(x => x.lastName.toLowerCase() === 'hahn')
-        console.log(griego)
         setClientList(response)
       })
       .catch((error: any) => { console.log(error) })
