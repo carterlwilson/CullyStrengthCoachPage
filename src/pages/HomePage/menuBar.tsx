@@ -93,6 +93,20 @@ export default function MenuBar (props: any): ReactElement {
             </Link>
               )
             : (<div/>)}
+          {!isAdmin
+            ? (
+              <a href="https://www.cullyfitnesstracker.com" style={{ width: '100%' }}>
+                <Button
+                  variant="solid"
+                  colorScheme="green"
+                  width="100%"
+                  id='lind_btn_2'>
+                  Tracker
+                </Button>
+              </a>
+              )
+            : (<div/>)
+          }
         </VStack>
         <Button
           onClick={logOut}

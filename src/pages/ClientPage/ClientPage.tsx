@@ -285,6 +285,7 @@ function ClientPage (): ReactElement {
   useEffect(() => {
     dataPersistence.getClients()
       .then(response => {
+        console.log('count', response.length)
         setClientList(response)
       })
       .catch((error: any) => { console.log(error) })
