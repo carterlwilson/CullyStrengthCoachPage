@@ -22,7 +22,7 @@ export default function LoginPage (): ReactElement {
         setScheduleList(scheduleList)
       })
       .catch(() => {})
-  }, [])
+  }, [dataPersistence])
 
   onAuthStateChanged(auth, (user) => {
     if (user?.email != null) {

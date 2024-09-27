@@ -301,7 +301,7 @@ function ClientPage (): ReactElement {
         setScheduleList(response)
       })
       .catch(() => {})
-  }, [])
+  }, [dataPersistence])
 
   return (
         <Flex direction="column" m={5}>
