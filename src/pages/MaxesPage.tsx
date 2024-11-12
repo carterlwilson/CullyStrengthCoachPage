@@ -26,7 +26,7 @@ export default function MaxesPage (): ReactElement {
       setClient(value)
     }).catch(() => {})
     dataPersistence.getExercises().then((value) => { setExercises(value) }).catch(() => {})
-  }, [dataPersistence])
+  }, [])
 
   const addNewMax = (): void => {
     addNewMaxModal.onClose()
