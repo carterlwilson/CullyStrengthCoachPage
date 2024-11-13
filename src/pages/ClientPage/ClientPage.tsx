@@ -34,6 +34,7 @@ function ClientPage (): ReactElement {
   const [clientToDelete, setClientToDelete] = useState(initialClient)
   const [exerciseRefs, setExerciseRefs] = useState<ExerciseReference[]>([])
   const [clientsFile, setClientsFile] = useState<File>()
+  const [massUpdateScheduleId, setMassUpdateScheduleId] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
   const deleteDialog = useDisclosure()
   const maxesDialog = useDisclosure()
@@ -42,6 +43,7 @@ function ClientPage (): ReactElement {
   const editLastNameDialog = useDisclosure()
   const editEmailDialog = useDisclosure()
   const editScheduleDialog = useDisclosure()
+  const setAllSchedulesDialog = useDisclosure()
   const cancelRef = React.useRef() as any
   const toast = useToast()
 
@@ -282,9 +284,35 @@ function ClientPage (): ReactElement {
     reader.readAsText(clientsFile as Blob)
   }
 
+  const setScheduleForAllClients = (): void => {
+    clientList.forEach(client => {
+      dataPersistence.updateClient({ ...client, scheduleId: massUpdateScheduleId })
+        .then(success => {
+          console.log(success)
+          toast({
+            title: 'Success',
+            description: `Successfully updated schedules for ${clientList.length} clients.`,
+            status: 'success',
+            duration: 9000,
+            isClosable: true
+          })
+        }).catch(error => {
+          toast({
+            title: 'Failure',
+            description: error,
+            status: 'error',
+            duration: 9000,
+            isClosable: true
+          })
+        })
+    })
+    setAllSchedulesDialog.onClose()
+  }
+
   useEffect(() => {
     dataPersistence.getClients()
       .then(response => {
+        console.log('count', response.length)
         setClientList(response)
       })
       .catch((error: any) => { console.log(error) })
@@ -315,6 +343,7 @@ function ClientPage (): ReactElement {
                 type='file'
                 onChange={(e => { handleClientsFileInput(e) })}/>
               <Button onClick={onSubmitClientsFile} mr={5}>Submit</Button>
+              <Button onClick={setAllSchedulesDialog.onOpen}>Set Schedule for All Clients</Button>
             </Box>
             <Button
                 w="100px"
@@ -526,6 +555,28 @@ function ClientPage (): ReactElement {
                 scheduleList={scheduleList}
                 editScheduleDialog={editScheduleDialog}
                 setSchedule={updateSchedule}/>
+            <Modal isOpen={setAllSchedulesDialog.isOpen} onClose={setAllSchedulesDialog.onClose}>
+              <ModalContent>
+                <ModalHeader fontSize='lg' fontWeight='bold'>
+                  Set All Schedules
+                </ModalHeader>
+                <ModalBody>
+                  <Select placeholder='Select schedule' onChange={(event) => { setMassUpdateScheduleId(event.target.value) }}>
+                      {scheduleList.map((schedule, index) => {
+                        return (
+                              <option key={index} value={schedule.Id}>{schedule.Name}</option>
+                        )
+                      })}
+                  </Select>
+                  <Button colorScheme='red' ref={cancelRef} onClick={setAllSchedulesDialog.onClose} mt='20px'>
+                    Cancel
+                  </Button>
+                  <Button colorScheme='green' ml={3} mt='20px' onClick={setScheduleForAllClients}>
+                    Ok
+                  </Button>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
         </Flex>
   )
 }
