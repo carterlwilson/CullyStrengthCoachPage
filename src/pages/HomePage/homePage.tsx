@@ -4,7 +4,6 @@ import { Outlet } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { store } from '../../app/Store'
 import React, { type ReactElement } from 'react'
-import 'firebaseui/dist/firebaseui.css'
 import MenuBar from '..//HomePage/menuBar'
 
 function HomePage (): ReactElement {
